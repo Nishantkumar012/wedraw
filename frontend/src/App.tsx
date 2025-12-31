@@ -372,6 +372,7 @@ const onMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
   /* ✏️ FINISH DRAW */
   if (modeRef.current === "drawing") {
     modeRef.current = "idle";
+    console.log("hello")
 
     const { x: startX, y: startY } = startRef.current;
 
