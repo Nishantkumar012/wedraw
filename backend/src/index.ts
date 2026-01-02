@@ -137,7 +137,8 @@ async function start() {
                   JSON.stringify({
                     action: "element_added",
                     element: {
-                      // id: created.id,
+                      // this was hidden
+                      id: created.id,
                       boardId: created.boardId,
                       type: created.type,
                       data: created.data,
