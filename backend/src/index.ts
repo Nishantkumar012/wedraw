@@ -152,7 +152,8 @@ async function start() {
           // ─────────────────────────────────────
           // 🔄 UPDATE ELEMENT
           // ─────────────────────────────────────
-          if (msg.action === "element_update") {
+          if (msg.action === "element_updated") {
+            // console.log("Elment updated",msg)
             const { boardId, elementId, data } = msg;
             if (!boardId || !elementId || !data) return;
 
@@ -163,7 +164,12 @@ async function start() {
 
             const updated = await prisma.element.update({
               where: { id: elementId },
-              data: { data },
+              data: { data:{
+                x: data.x,
+                y: data.y,
+                width: data.width,
+                height: data.height
+              } },
             });
 
             const room = rooms.get(boardId);
@@ -181,6 +187,48 @@ async function start() {
               }
             }
           }
+
+          // _____________________________________
+
+              if(msg.action === "element_dragging"){
+                   
+                    const  { boardId , elementId, data } = msg;
+
+                    
+
+                    if(!boardId || !elementId || !data) return;
+
+                    const permission = await prisma.permission.findFirst({
+                        where:{
+                            userId:ws.userId,
+                            boardId
+                        }
+                    })
+
+                      if(!permission) return;
+
+                      const room = rooms.get(boardId);
+                      if(!room ) return;
+
+                      for(const client of room){
+
+                            // 🔥 sender ko wapas mat bhejo
+                            if (client === ws) continue;
+
+                         if(client.readyState === WebSocket.OPEN){
+                           client.send(
+                             JSON.stringify({
+                               action:"element_dragging",
+                               elementId,
+                               data
+                             })
+                           )
+                         }
+                      }
+
+              }
+
+          // _____________________________________
           
         } catch (err) {
           console.error("❌ WS message error:", err);

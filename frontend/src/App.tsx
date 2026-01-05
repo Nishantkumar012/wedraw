@@ -31,6 +31,8 @@ function App() {
   const draggingIdRef = useRef<string | null>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
 
+  const lastDragSentRef = useRef(0);
+
   const [joined, setJoined] = useState(false);
 
 
@@ -40,6 +42,7 @@ function App() {
     connectWS(TOKEN, (msg: any) => {
       if (msg.action === "element_added") {
         const el = msg.element;
+        // console.log(msg.action);
          
         console.log("el is:", el);
         const newShape: Shape = {
@@ -66,6 +69,34 @@ function App() {
 
         redraw();
       }
+
+
+      if(msg.action === "element_dragging"){
+              // console.log
+            //  const el = msg;
+            shapesRef.current = shapesRef.current.map((s)=>
+             s.id === msg.elementId
+            ? { ...s,
+          x: msg.data.x,
+          y: msg.data.y}
+            : s);
+
+            redraw()
+      }
+
+
+       //was error
+        if(msg.action === "element_updated"){
+             const el = msg.element;
+
+             shapesRef.current = shapesRef.current.map((s) =>
+                 
+               s.id == el.id
+               ?{...s, ...msg.data}
+               :s
+            )
+            redraw();
+        }
     });
   }, []);
 
@@ -174,6 +205,30 @@ function App() {
     ];
   };
 
+  
+  // for dragging real time users
+   
+     const sendDraggingWs = (s: Shape) =>{
+          
+         const now = Date.now();
+            // 40ms throttle
+          if(now - lastDragSentRef.current < 40) return ;
+
+          lastDragSentRef.current = now;
+
+          sendWS({
+              action: "element_dragging",
+              boardId: BOARD_ID,
+              elementId: s.id,
+              data: {
+                x: s.x,
+                y: s.y
+              }
+          })
+     }
+
+
+
   /* Mouse Down */
   const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!joined) return;
@@ -212,6 +267,7 @@ function App() {
 
 
       redraw();
+      sendDraggingWs(s); 
       return;
     }
 
