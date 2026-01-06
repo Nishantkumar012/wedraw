@@ -1,7 +1,8 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState} from "react";
 import connectWS, { sendWS } from "./ws";
 import { fetchElements } from "./api";
+import { type ElementType} from "./types.ts";
 
 const TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1Njk2YjdjYi1lNGVjLTRkZGEtYTc4Zi1hMGZjOGRhY2NhMDIiLCJpYXQiOjE3NjczNzI1MDQsImV4cCI6MTc2Nzk3NzMwNH0.qgTbwBNKlhDD90Qtvv5U_8JYI5JiaZuxGnIr-Lmeb_M";
@@ -12,6 +13,7 @@ const BOARD_ID = "96825e49-575c-4585-ba8a-5b82807a8b41";
 // Added optional isTemp flag
 type Shape = {
   id: string;
+  type:ElementType
   x: number;
   y: number;
   width: number;
@@ -33,6 +35,8 @@ function App() {
 
   const lastDragSentRef = useRef(0);
 
+  const [tool, setTool] = useState<ElementType>("RECTANGLE");
+  const toolRef = useRef<ElementType>("RECTANGLE");
   const [joined, setJoined] = useState(false);
 
 
@@ -47,6 +51,7 @@ function App() {
         console.log("el is:", el);
         const newShape: Shape = {
           id: el.id,
+          type: el.type,
           x: el.data.x,
           y: el.data.y,
           width: el.data.width,
@@ -152,7 +157,8 @@ function App() {
     ctx.strokeStyle = "blue";
     ctx.lineWidth = 2;
     shapesRef.current.forEach((s) => {
-      ctx.strokeRect(s.x, s.y, s.width, s.height);
+      // ctx.strokeRect(s.x, s.y, s.width, s.height);
+      drawShape(ctx,s)
     });
   };
 
@@ -170,6 +176,7 @@ function App() {
 
       shapesRef.current = elements.map((el: any) => ({
         id: el.id,
+        type:el.type,
         x: el.data.x,
         y: el.data.y,
         width: el.data.width,
@@ -278,12 +285,25 @@ function App() {
       const ctx = ctxRef.current!;
       ctx.strokeStyle = "red";
       ctx.setLineDash([6, 6]);
-      ctx.strokeRect(
-        Math.min(startX, x),
-        Math.min(startY, y),
-        Math.abs(startX - x),
-        Math.abs(startY - y)
-      );
+
+      if(toolRef.current === "RECTANGLE"){
+
+        ctx.strokeRect(
+          Math.min(startX, x),
+          Math.min(startY, y),
+          Math.abs(startX - x),
+          Math.abs(startY - y)
+        );
+      }else if(toolRef.current === "CIRCLE"){
+          const rx = Math.abs(startX -x)/2;
+          const ry = Math.abs(startY - y)/2;
+          const cx = Math.min(startX, x) +rx;
+          const cy = Math.min(startY, y) + ry;
+
+          ctx.beginPath();
+          ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+          ctx.stroke()
+      }
       ctx.setLineDash([]);
     }
   };
@@ -337,6 +357,7 @@ function App() {
       const tempId = crypto.randomUUID();
       const newShape: Shape = {
         id: tempId,
+        type: toolRef.current,
         x,
         y,
         width,
@@ -353,7 +374,7 @@ function App() {
         action: "element_add",
         boardId: BOARD_ID,
         element: {
-          type: "RECTANGLE",
+          type: toolRef.current,
           data: { x, y, width, height },
         },
       });
@@ -375,6 +396,38 @@ function App() {
           {/* {{console.log(joined)}} */}
         </button>
       </div>
+        
+           <div className="fixed top-3 left-[400px] z-10 flex gap-2 rounded-lg bg-white px-3 py-2 shadow-md">
+            <button
+              onClick={() => {
+                  
+                setTool("RECTANGLE")
+                toolRef.current = "RECTANGLE"}}
+              className={`cursor-pointer rounded-md border px-3 py-1.5
+                ${
+                  tool === "RECTANGLE"
+                    ? "bg-blue-600 text-white"
+                    : "border-gray-300 bg-white text-black"
+                }`}
+            >
+              ▭ Rect
+            </button>
+
+            <button
+              onClick={() => {
+                
+                setTool("CIRCLE")
+                toolRef.current = "CIRCLE"}}
+              className={`cursor-pointer rounded-md border px-3 py-1.5
+                ${
+                  tool === "CIRCLE"
+                    ? "bg-blue-600 text-white"
+                    : "border-gray-300 bg-white text-black"
+                }`}
+            >
+              ◯ Circle
+            </button>
+          </div>
 
       {/* Canvas */}
       <canvas
@@ -389,6 +442,44 @@ function App() {
 }
 export default App;
 
+
+
+ const drawRect =(
+    ctx: CanvasRenderingContext2D,
+    s: Shape
+   )=>{
+       
+     ctx.strokeRect(s.x,s.y,s.width,s.height);
+  }
+
+  const drawCircle = (
+    ctx: CanvasRenderingContext2D,
+    s: Shape
+  )=>{
+     
+    const cx = s.x + s.width/2;
+    const cy = s.y + s.height/2;
+    const rx = s.width/2;
+    const ry = s.height/2;
+
+     ctx.beginPath();
+     ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI * 2);
+     ctx.stroke();
+  }
+
+  const drawShape=(
+    ctx: CanvasRenderingContext2D,
+    s: Shape
+  )=>{
+       switch (s.type) {
+         case "RECTANGLE":
+          drawRect(ctx,s);
+          break;
+          case "CIRCLE":
+            drawCircle(ctx,s);
+            break;
+       }
+  }
 
 
 
