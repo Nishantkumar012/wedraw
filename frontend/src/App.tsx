@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState} from "react";
 import connectWS, { sendWS } from "./ws";
 import { fetchElements } from "./api";
-import { type ElementType} from "./types.ts";
+import {type PencilStroke, type ElementType} from "./types.ts";
 
 const TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1Njk2YjdjYi1lNGVjLTRkZGEtYTc4Zi1hMGZjOGRhY2NhMDIiLCJpYXQiOjE3NjczNzI1MDQsImV4cCI6MTc2Nzk3NzMwNH0.qgTbwBNKlhDD90Qtvv5U_8JYI5JiaZuxGnIr-Lmeb_M";
@@ -35,6 +35,9 @@ function App() {
 
   const lastDragSentRef = useRef(0);
 
+  const pencilStrokeRef = useRef<PencilStroke[]>([]);
+  const currentStrokeRef = useRef<PencilStroke | null>(null);
+
   const [tool, setTool] = useState<ElementType>("RECTANGLE");
   const toolRef = useRef<ElementType>("RECTANGLE");
   const [joined, setJoined] = useState(false);
@@ -48,6 +51,18 @@ function App() {
         const el = msg.element;
         // console.log(msg.action);
          
+        if(el.type === "PENCIL"){
+            
+            pencilStrokeRef.current.push({
+              id: el.id,
+              type: "PENCIL",
+              points: el.data.points,
+            });
+            redraw();
+            return;
+        }
+
+
         console.log("el is:", el);
         const newShape: Shape = {
           id: el.id,
@@ -122,6 +137,7 @@ function App() {
     return () => window.removeEventListener("resize", resize);
   }, []);
 
+
   const isInsideShape = (x: number, y: number, s: Shape) => {
     return x >= s.x && x <= s.x + s.width && y >= s.y && y <= s.y + s.height;
   };
@@ -156,10 +172,26 @@ function App() {
     // Shapes
     ctx.strokeStyle = "blue";
     ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
     shapesRef.current.forEach((s) => {
       // ctx.strokeRect(s.x, s.y, s.width, s.height);
       drawShape(ctx,s)
     });
+
+
+    pencilStrokeRef.current.forEach((stroke)=>{
+         drawPencilStroke(ctx, stroke);
+    })
+
+    if(currentStrokeRef.current){
+         drawPencilStroke(ctx, currentStrokeRef.current);
+    }
+
+
+    
+      
   };
 
   /* Join board & load existing elements */
@@ -173,15 +205,50 @@ function App() {
 
     try {
       const elements = await fetchElements(BOARD_ID, TOKEN);
+      
+      //   elements.forEach((el:any) => {
+            
+      //        if(el.type === "PENCIL"){
+      //            pencilStrokeRef.current.push({
+      //              id: el.id,
+      //              type: "PENCIL",
+      //              points: el.data.points,
+      //            })
+      //        } else{
+              
+      //        }
+      //   });
+      // shapesRef.current = elements.map((el: any) => ({
+      //   id: el.id,
+      //   type:el.type,
+      //   x: el.data.x,
+      //   y: el.data.y,
+      //   width: el.data.width,
+      //   height: el.data.height,
+      // }));
 
-      shapesRef.current = elements.map((el: any) => ({
-        id: el.id,
-        type:el.type,
-        x: el.data.x,
-        y: el.data.y,
-        width: el.data.width,
-        height: el.data.height,
-      }));
+         
+         shapesRef.current = [];
+pencilStrokeRef.current = [];
+
+elements.forEach((el: any) => {
+  if (el.type === "PENCIL"  && Array.isArray(el.data?.points)) {
+    pencilStrokeRef.current.push({
+      id: el.id,
+      type: "PENCIL",
+      points: el.data.points,
+    });
+  } else {
+    shapesRef.current.push({
+      id: el.id,
+      type: el.type,
+      x: el.data.x,
+      y: el.data.y,
+      width: el.data.width,
+      height: el.data.height,
+    });
+  }
+});
 
       redraw();
       setJoined(true);
@@ -189,6 +256,7 @@ function App() {
       console.log("failed to load board", error);
     }
   };
+
 
   /* Mouse position helper */
   const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -242,6 +310,19 @@ function App() {
 
     const { x, y } = getMousePos(e);
 
+    
+    if(toolRef.current === "PENCIL"){
+        modeRef.current = "drawing";
+        currentStrokeRef.current = {
+              id: crypto.randomUUID(),
+              type: "PENCIL",
+              points: [{x,y}]
+        };
+        return;
+
+    }
+
+
     // Check if clicking on an existing shape (from top to bottom)
     for (let i = shapesRef.current.length - 1; i >= 0; i--) {
       const s = shapesRef.current[i];
@@ -264,6 +345,55 @@ function App() {
   /* Mouse Move */
   const onMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const { x, y } = getMousePos(e);
+
+
+    // if(modeRef.current === "drawing" &&
+    //    toolRef.current === "PENCIL" &&
+    //    currentStrokeRef.current
+    // ){
+    //     currentStrokeRef.current.points.push({x,y});
+    //     redraw();
+    //     return;
+    // }
+
+    if (
+  modeRef.current === "drawing" &&
+  toolRef.current === "PENCIL" &&
+  currentStrokeRef.current
+) {
+  currentStrokeRef.current.points.push({ x, y });
+  redraw();
+  return;
+}
+
+
+//     if (
+//   modeRef.current === "drawing" &&
+//   toolRef.current === "PENCIL" &&
+//   currentStrokeRef.current
+// ) {
+//   const stroke = currentStrokeRef.current;
+
+//   pencilStrokeRef.current.push(stroke);
+//   currentStrokeRef.current = null;
+//   modeRef.current = "idle";
+//   redraw();
+
+//   sendWS({
+//     action: "pencil_add",
+//     boardId: BOARD_ID,
+//     elements: {
+//       type: "PENCIL",
+//       data: {
+//         points: stroke.points
+//       }
+//     }
+   
+//   });
+
+//   return;
+// }
+
 
     if (modeRef.current === "dragging") {
       const s = shapesRef.current.find((sh) => sh.id === draggingIdRef.current);
@@ -311,6 +441,34 @@ function App() {
   /* Mouse Up - Finalize drag or draw */
   const onMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const { x: endX, y: endY } = getMousePos(e);
+
+     // PENCIL      
+      if(modeRef.current === "drawing" && toolRef.current === "PENCIL" && currentStrokeRef.current){
+            
+             const stroke = currentStrokeRef.current;
+            pencilStrokeRef.current.push(stroke);
+            currentStrokeRef.current =null;
+            modeRef.current = "idle";
+            redraw();
+
+             sendWS({
+                 action: "element_add",
+                 boardId: BOARD_ID,
+                 element: {
+                   type: "PENCIL",
+                   data: {
+                     points: stroke.points
+                   }
+                 }
+             })
+
+            // currentStrokeRef.current = null;
+
+             
+            return;
+      }
+
+
 
     /* Finish dragging */
     if (modeRef.current === "dragging") {
@@ -427,6 +585,22 @@ function App() {
             >
               ◯ Circle
             </button>
+
+                        <button
+              onClick={() => {
+                setTool("PENCIL");
+                toolRef.current = "PENCIL";
+              }}
+              className={`cursor-pointer rounded-md border px-3 py-1.5
+                ${
+                  tool === "PENCIL"
+                    ? "bg-blue-600 text-white"
+                    : "border-gray-300 bg-white text-black"
+                }`}
+            >
+              ✏️ Pencil
+            </button>
+
           </div>
 
       {/* Canvas */}
@@ -441,6 +615,8 @@ function App() {
   );
 }
 export default App;
+
+
 
 
 
@@ -479,6 +655,32 @@ export default App;
             drawCircle(ctx,s);
             break;
        }
+  }
+
+
+  const drawPencilStroke = (
+    ctx: CanvasRenderingContext2D,
+    stroke: PencilStroke
+  ) => {
+      
+      //  const pts = stroke.points;
+
+      //  if(pts.length <2) return;
+
+      if (!stroke?.points || stroke.points.length < 2) return;
+
+  const pts = stroke.points;
+
+       ctx.beginPath();
+       ctx.moveTo(pts[0].x,pts[0].y);
+
+       for(let i=1; i<pts.length; i++){
+          ctx.lineTo(pts[i].x, pts[i].y);
+       }
+
+       ctx.stroke();
+
+
   }
 
 

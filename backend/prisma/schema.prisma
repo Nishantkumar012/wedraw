@@ -23,6 +23,7 @@ enum Role {
 enum ElementType {
   RECTANGLE
   CIRCLE
+  PENCIL
   LINE
   TEXT
   IMAGE
