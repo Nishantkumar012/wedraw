@@ -7,10 +7,10 @@ import {type PencilStroke, type ElementType} from "./types.ts";
 import { useParams } from "react-router-dom";
 
 // joe
-// const TOKEN ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1Njk2YjdjYi1lNGVjLTRkZGEtYTc4Zi1hMGZjOGRhY2NhMDIiLCJpYXQiOjE3Njg5MTA1MTJ9.8tqhdajgxNEB0VZmdG6N_3ILHqM922YfD_Ugnzlfcts";
+const TOKEN ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1Njk2YjdjYi1lNGVjLTRkZGEtYTc4Zi1hMGZjOGRhY2NhMDIiLCJpYXQiOjE3Njg5MTA1MTJ9.8tqhdajgxNEB0VZmdG6N_3ILHqM922YfD_Ugnzlfcts";
 
 
-    const TOKEN = localStorage.getItem('token') as string;
+    // const TOKEN = localStorage.getItem('token') as string;
 
 // const BOARD_ID = "96825e49-575c-4585-ba8a-5b82807a8b41";
 
