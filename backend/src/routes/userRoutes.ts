@@ -94,7 +94,9 @@ router.post("/register", async (req, res) => {
                                     sameSite: isProd ? "none" : "lax"
                                 });
 
-                             return res.json({message:"Login successfull", token});
+                             return res.json({message:"Login successfull",
+                                  ...(isProd ? {} : { token })
+                                });
 
                              } catch (error) {
                                       return res.status(500).json({ error: "Server error" });
