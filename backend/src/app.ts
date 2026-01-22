@@ -11,11 +11,14 @@ import cors from 'cors'
 const app = express();
 app.use(cookieParser());
 
-app.use(cors({
-    origin: ["http://localhost:5173" , "https://wedraw-hbbh8bqo6-nishants-projects-a6a81365.vercel.app"],
-    credentials: true
-}))
+// app.use(cors({
+//     origin: ["http://localhost:5173" , "https://wedraw-hbbh8bqo6-nishants-projects-a6a81365.vercel.app"],
+//     credentials: true
+// }))
 
+app.use(cors({
+  origin: "*"
+}));
 
 app.use(express.json());
 // this uis app.ts
