@@ -5,6 +5,8 @@ type SignupResponse = {
   token: string;
 };
 
+const BACKEND = import.meta.env.VITE_BACKEND_URL;
+
 export default function Signup() {
   const navigate = useNavigate();
 
@@ -26,7 +28,7 @@ export default function Signup() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/user/register", {
+      const res = await fetch(`${BACKEND}/user/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

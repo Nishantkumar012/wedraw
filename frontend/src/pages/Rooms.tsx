@@ -6,6 +6,8 @@ type Room = {
   title: string;
 };
 
+const BACKEND = import.meta.env.VITE_BACKEND_URL;
+
 const Rooms = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ const Rooms = () => {
   try {
     setCreating(true);
 
-    const res = await fetch("http://localhost:3000/boards", {
+    const res = await fetch(`${BACKEND}/boards`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +78,7 @@ useEffect(() => {
 
   const fetchBoards = async () => {
     try {
-      const res = await fetch("http://localhost:3000/boards/me", {
+      const res = await fetch(`${BACKEND}/boards/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

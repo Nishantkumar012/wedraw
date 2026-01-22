@@ -5,6 +5,9 @@ type SigninResponse = {
   token: string;
 };
 
+const BACKEND = import.meta.env.VITE_BACKEND_URL;
+
+
 export default function Signin() {
   const navigate = useNavigate();
 
@@ -25,7 +28,7 @@ export default function Signin() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/user/login", {
+      const res = await fetch(`${BACKEND}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

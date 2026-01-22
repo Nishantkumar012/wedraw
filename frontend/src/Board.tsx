@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 
 // const BOARD_ID = "96825e49-575c-4585-ba8a-5b82807a8b41";
 
+const BACKEND = import.meta.env.VITE_BACKEND_URL;
 
 // Added optional isTemp flag
 type Shape = {
@@ -25,6 +26,8 @@ type Shape = {
   height: number;
   isTemp?: boolean; // ← temporary optimistic shape marker
 };
+
+
 
 function Board() {
   
@@ -71,7 +74,7 @@ const inviteUser = async()=>{
           setInviting(true);
 
             const res = await fetch(
-                `http://localhost:3000/boards/${boardId}/invite`,
+                `${BACKEND}/boards/${boardId}/invite`,
                 {
                     method: "POST",
                     headers: {
