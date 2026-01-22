@@ -5,6 +5,8 @@ import { WebSocketServer, WebSocket } from "ws";
 import { prisma } from "./lib/prisma";
 import { app } from "./app";
 
+ //this is index.ts
+
 // ─────────────────────────────────────────────
 // Extend WebSocket type
 // ─────────────────────────────────────────────
@@ -36,7 +38,35 @@ async function start() {
       // ─────────────────────────────────────────
       try {
         const url = new URL(req.url!, `http://${req.headers.host}`);
-        const token = url.searchParams.get("token");
+        let  token = url.searchParams.get("token");
+
+            if(!token && process.env.NODE_ENV === "production"){
+                 
+                   const cookies = req.headers.cookie;
+
+                   token = cookies
+                  ?.split("; ")
+                  .find(c => c.startsWith("token="))
+                  ?.split("=")[1] ?? null;
+                      }
+
+    //      // cookie vala for production
+    //      const cookies = req.headers.cookie;
+         
+    //        if (!cookies && process.env.NODE_ENV === "development") {
+    //   console.log("⚠️ WS connected without cookie (dev mode)");
+    //   return;
+    // }
+
+    //      if(!cookies){
+    //        ws.close();
+    //       return;
+    //      }
+
+    //        const token = cookies
+    //   .split("; ")
+    //   .find(c => c.startsWith("token="))
+    //   ?.split("=")[1];
 
         if (!token) {
           ws.close();

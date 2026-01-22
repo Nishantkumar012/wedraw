@@ -5,8 +5,13 @@ let ws: WebSocket | null =null;
 
 export default function connectWs(token: string, onMessage: (data: any) => void){
      
-   ws = new WebSocket(`ws://localhost:3000?token=${token}`);
+   const WS_URL = import.meta.env.DEV
+  ? `ws://localhost:3000?token=${token}`
+  : "wss://wedraw-f0f7.onrender.com";
 
+//    ws = new WebSocket(`ws://localhost:3000?token=${token}`);
+
+     ws = new WebSocket(WS_URL);
    ws.onopen = () =>{
        console.log("✅ WS connected");
    }

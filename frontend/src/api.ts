@@ -1,8 +1,10 @@
 
 
+const BACKEND = import.meta.env.VITE_BACKEND_URL;
+
 export async function fetchElements(boardId:string,token:string){
         
-       const res = await fetch(`http://localhost:3000/boards/${boardId}/elements`,{
+       const res = await fetch(`${BACKEND}/boards/${boardId}/elements`,{
             headers: {
                 Authorization : `Bearer ${token}`,
             }

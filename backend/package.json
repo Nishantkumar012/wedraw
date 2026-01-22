@@ -6,14 +6,13 @@
   "scripts": {
     "dev": "nodemon --watch src --exec tsx src/index.ts",
     "start": "npx tsx src/index.ts",
-      "postinstall": "prisma generate"
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
- 
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -28,9 +27,11 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-       "@prisma/client": "^7.1.0",
     "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/client": "^7.1.0",
+    "@types/cookie-parser": "^1.4.10",
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
