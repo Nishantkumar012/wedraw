@@ -27,7 +27,7 @@ const Home = () => {
       </p>
 
       <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
-        <Link to="/signin">
+        <Link to="/login">
           <button
             style={{
               padding: "10px 18px",

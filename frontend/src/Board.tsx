@@ -28,6 +28,11 @@ type Shape = {
 
 function Board() {
   
+    const [showInviteModal, setShowInviteModal] = useState(false);
+const [inviteEmail, setInviteEmail] = useState("");
+const [inviteRole, setInviteRole] = useState("EDITOR");
+const [inviting, setInviting] = useState(false);
+ 
  const {boardId} = useParams<{boardId: string}>();
 
  const BOARD_ID = boardId as string;
@@ -50,6 +55,52 @@ function Board() {
   const [tool, setTool] = useState<ElementType>("RECTANGLE");
   const toolRef = useRef<ElementType>("RECTANGLE");
   const [joined, setJoined] = useState(false);
+
+
+
+ 
+const inviteUser = async()=>{
+      
+       if(! inviteEmail.trim()){
+          alert("Email is required");
+          return;
+       }
+
+       try {
+            
+          setInviting(true);
+
+            const res = await fetch(
+                `http://localhost:3000/boards/${boardId}/invite`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${TOKEN}`,
+                    },
+                    body: JSON.stringify({
+                         email: inviteEmail,
+                         role: inviteRole
+                    }),
+                }
+            );
+             if (!res.ok) throw new Error("Failed to invite user");
+
+    alert("Invite sent ✉️");
+
+    setInviteEmail("");
+    setInviteRole("EDITOR");
+    setShowInviteModal(false);
+
+
+       } catch (error:any) {
+          alert(error.message || "Error inviting user");
+
+       }finally{
+           setInviting(false);
+       }
+}
+
 
 
 
@@ -611,6 +662,15 @@ elements.forEach((el: any) => {
             </button>
 
           </div>
+                
+        <div className="absolute top-4 right-4 z-10">
+             <button
+             onClick={() => setShowInviteModal(true)}
+             className="rounded-lg bg-purple-600 px-4 py-2 text-white shadow-md hover:bg-purple-700"
+             >
+               👤 Invite User
+             </button>
+        </div>
 
       {/* Canvas */}
       <canvas
@@ -620,6 +680,55 @@ elements.forEach((el: any) => {
         onMouseUp={onMouseUp}
         className="absolute inset-0 cursor-crosshair"
       />
+
+      {showInviteModal && (
+           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+             <div className="w-96 rounded-2xl bg-white p-6 shadow-2xl">
+               
+               <h2 className="mb-4 text-xl font-bold text-slate-900">
+                  ✉️ Invite user
+               </h2>
+               
+               <input
+                 type="email"
+                 placeholder="User email"
+                 value={inviteEmail}
+                 onChange={(e)=> setInviteEmail(e.target.value)}
+                 className="mb-3 w-full rounded-xl border p-2 focus:outline-none focus:ring-purple-400"
+               />
+
+               <select
+                 value={inviteRole}
+                 onChange={(e)=> setInviteRole(e.target.value)}
+                 className="mb-4 w-full rounded-xl border p-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                >
+                 <option value="EDITOR">Editor</option>
+                 <option value="VIEWER">Viewer</option>
+                 <option value="OWNER">Owner</option> 
+               </select>
+                <div className="flex justify-end gap-2">
+                        <button
+                        onClick={() => {
+                            setShowInviteModal(false);
+                            setInviteEmail("");
+                            setInviteRole("EDITOR");
+                        }}
+                        className="rounded-xl bg-slate-200 px-4 py-2 hover:bg-slate-300"
+                        >
+                        Cancel
+                        </button>
+
+                        <button
+                        onClick={inviteUser}
+                        disabled={inviting}
+                        className="rounded-xl bg-purple-600 px-4 py-2 text-white hover:bg-purple-700 disabled:opacity-50"
+                        >
+                        {inviting ? "Inviting..." : "Send Invite"}
+                        </button>
+                </div>
+             </div>
+            </div>
+      )}
     </div>
   );
 }
