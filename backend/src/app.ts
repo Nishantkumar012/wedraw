@@ -10,7 +10,7 @@ import cors from 'cors'
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:5173" , "https://wedraw-f0f7.onrender.com"],
+    origin: ["http://localhost:5173" , "https://wedraw-hbbh8bqo6-nishants-projects-a6a81365.vercel.app"],
     credentials: true
 }))
 
