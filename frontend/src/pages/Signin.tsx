@@ -30,6 +30,7 @@ export default function Signin() {
 
       const res = await fetch(`${BACKEND}/user/login`, {
         method: "POST",
+         credentials: "include",  //missing
         headers: {
           "Content-Type": "application/json",
         },
@@ -45,8 +46,13 @@ export default function Signin() {
 
       const data: SigninResponse = await res.json();
 
-      // store token
-      localStorage.setItem("token", data.token);
+      // // store token
+      // localStorage.setItem("token", data.token);
+
+       // token only exists in DEV
+if (import.meta.env.DEV && data.token) {
+  localStorage.setItem("token", data.token);
+}
 
       // redirect to rooms
       navigate("/rooms");
