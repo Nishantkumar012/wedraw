@@ -12,6 +12,8 @@ import { useParams } from "react-router-dom";
 
     const TOKEN = localStorage.getItem('token') as string;
 
+    console.log("token in board.jsx",  TOKEN )
+
 // const BOARD_ID = "96825e49-575c-4585-ba8a-5b82807a8b41";
 
 const BACKEND = import.meta.env.VITE_BACKEND_URL;
