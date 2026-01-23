@@ -5,9 +5,11 @@ let ws: WebSocket | null =null;
 
 export default function connectWs(token: string, onMessage: (data: any) => void){
      
-   const WS_URL = import.meta.env.DEV
+  const WS_URL = import.meta.env.DEV
   ? `ws://localhost:3000?token=${token}`
-  : "wss://wedraw-f0f7.onrender.com";
+  : `wss://wedraw-f0f7.onrender.com?token=${token}`;
+
+
 
 //    ws = new WebSocket(`ws://localhost:3000?token=${token}`);
 

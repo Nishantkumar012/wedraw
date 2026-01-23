@@ -86,16 +86,10 @@ router.post("/register", async (req, res) => {
 
 
                                 // 4️⃣ SET COOKIE  ← यही जगह है ✅
-                                const isProd = process.env.NODE_ENV === "production";
-
-                                res.cookie("token", token, {
-                                    httpOnly: true,
-                                    secure: isProd,
-                                    sameSite: isProd ? "none" : "lax"
-                                });
+                              
 
                              return res.json({message:"Login successfull",
-                                  ...(isProd ? {} : { token })
+                                   token 
                                 });
 
                              } catch (error) {

@@ -40,15 +40,15 @@ async function start() {
         const url = new URL(req.url!, `http://${req.headers.host}`);
         let  token = url.searchParams.get("token");
 
-            if(!token && process.env.NODE_ENV === "production"){
+            // if(!token && process.env.NODE_ENV === "production"){
                  
-                   const cookies = req.headers.cookie;
+            //        const cookies = req.headers.cookie;
 
-                   token = cookies
-                  ?.split("; ")
-                  .find(c => c.startsWith("token="))
-                  ?.split("=")[1] ?? null;
-                      }
+            //        token = cookies
+            //       ?.split("; ")
+            //       .find(c => c.startsWith("token="))
+            //       ?.split("=")[1] ?? null;
+            //           }
 
     //      // cookie vala for production
     //      const cookies = req.headers.cookie;

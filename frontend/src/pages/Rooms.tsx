@@ -8,6 +8,20 @@ type Room = {
 
 const BACKEND = import.meta.env.VITE_BACKEND_URL;
 
+// to check wheter you are in dev or not
+// export const isDev = import.meta.env.DEV;
+
+
+// export const getAuthHeaders = (): Record<string, string> => {
+//   if (isDev) {
+//     const token = localStorage.getItem("token");
+//     if (token) {
+//       return { Authorization: `Bearer ${token}` };
+//     }
+//   }
+//   return {};
+// };
+
 const Rooms = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,16 +50,24 @@ const Rooms = () => {
 
     const res = await fetch(`${BACKEND}/boards`, {
       method: "POST",
+      
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        
       },
       body: JSON.stringify({ title: newTitle }),
     });
 
-    if (!res.ok) {
-      throw new Error("Failed to create board");
+    // if (!res.ok) {
+    //   throw new Error("Failed to create board");
+    // }
+    
+     if (res.status === 401 || res.status === 403) {
+      navigate("/login");
+      return;
     }
+
 
     const board = await res.json();
 
@@ -80,9 +102,11 @@ useEffect(() => {
     try {
       const res = await fetch(`${BACKEND}/boards/me`, {
         method: "GET",
+        
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          // ...getAuthHeaders(), //dev only
         },
       });
 
