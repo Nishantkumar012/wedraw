@@ -3,6 +3,8 @@
 const BACKEND = import.meta.env.VITE_BACKEND_URL;
 
 export async function fetchElements(boardId:string,token:string){
+
+           console.log("token",token);
         
        const res = await fetch(`${BACKEND}/boards/${boardId}/elements`,{
             method: "GET",
