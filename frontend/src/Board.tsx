@@ -269,7 +269,7 @@ const inviteUser = async()=>{
     });
 
     try {
-      const elements = await fetchElements(BOARD_ID, TOKEN);
+      const elements = await fetchElements(BOARD_ID);
       
       //   elements.forEach((el:any) => {
             
