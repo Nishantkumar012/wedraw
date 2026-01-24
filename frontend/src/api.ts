@@ -10,7 +10,7 @@ export async function fetchElements(boardId:string){
     throw new Error("No auth token found");
   }
 
-           console.log("token",token);
+        //    console.log("token",token);
         
        const res = await fetch(`${BACKEND}/boards/${boardId}/elements`,{
             method: "GET",

@@ -117,7 +117,7 @@ useEffect(() => {
       }
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       setRooms(data); // rooms = boards from backend
     } catch (err: any) {
       setError(err.message || "Failed to fetch boards");
