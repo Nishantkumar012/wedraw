@@ -1,29 +1,31 @@
-import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from './assets/vite.svg'
-// import heroImg from './assets/hero.png'
-import { Routes, Route } from "react-router-dom";
-import Home from './Home';
-
-import './App.css'
-import Signup from './features/auth/Signup';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './features/auth/Login';
+import Signup from './features/auth/Signup';
+import { Dashboard } from './features/dashboard/Dashboard';
+import { BoardView } from './features/board/BoardView';
+import { ProtectedRoute } from './routes/ProtectedRoute';
+import { PublicRoute } from './routes/PublicRoute';
 
 function App() {
   return (
-    <Routes >
-      <Route path="/" element={<Home />} />
-      <Route path="/signup" element={<Signup/>}/>
-      <Route path="/login" element={<Login/>}/>
-      {/* <Route path="/about" element={<About />} /> */}
-      {/* <Route path="/contact" element={<Contact />} /> */}
-      // should be boards
-      {/* <Route path="/rooms" element={<Rooms/>}/> */}
-      {/* <Route path="/room/:boardId" element={<Board/>}/> */}
+    <Routes>
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Route>
+
+      {/* Mixed Route: User OR Guest Token */}
+      <Route path="/board/:boardId" element={<BoardView />} />
+
+      {/* Fallbacks */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
 
 export default App;
-
-

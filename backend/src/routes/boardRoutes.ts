@@ -47,37 +47,37 @@ router.post("/", authMiddleware, async (req, res) => {
 
 
 // get all the shapes
-router.get("/:boardId/elements",authMiddleware, async(req,res)=>{
-        
-          const {boardId} = req.params;
-          const userId = req.userId;
-              
-          // console.log("I am in elements fetching routes");
-            if (!userId) {
-               return res.status(401).json({ error: "Unauthorized" });
-            }
+router.get("/:boardId/elements", authMiddleware, async (req, res) => {
 
-          try {
-                const permission = await prisma.permission.findFirst({
-                     where:{
-                      boardId,
-                      userId
-                     }
-                })
-              
-                 if (!permission) {
-                   return res.status(403).json({ error: "Access denied" });
-                 }
+  const { boardId } = req.params;
+  const userId = req.userId;
 
-                 const elements = await prisma.element.findMany({
-                     where : {boardId},
-                     orderBy: { createdAt: "asc"}
-                 })
-             res.json(elements);
-          } catch (error) {
-               console.error("Failed to fetch elements", error);
-               res.status(500).json({ error: "Failed to fetch elements" });
-          }
+  // console.log("I am in elements fetching routes");
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  try {
+    const permission = await prisma.permission.findFirst({
+      where: {
+        boardId,
+        userId
+      }
+    })
+
+    if (!permission) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const elements = await prisma.element.findMany({
+      where: { boardId },
+      orderBy: { createdAt: "asc" }
+    })
+    res.json(elements);
+  } catch (error) {
+    console.error("Failed to fetch elements", error);
+    res.status(500).json({ error: "Failed to fetch elements" });
+  }
 })
 
 
@@ -190,7 +190,7 @@ router.post("/:boardId/elements", authMiddleware, async (req, res) => {
     const element = await prisma.element.create({
       data: {
         boardId,
-        type,
+        type: type.toUpperCase(),
         data
       }
     });
@@ -255,41 +255,41 @@ router.post("/:boardId/invite", authMiddleware, async (req, res) => {
       return res.json({ message: "User already has access" });
     }
 
-  
-
-  //   let safeRole: Role = Role.EDITOR;
-
-  //   if(role === Role.VIEWER){
-  //        safeRole = Role.VIEWER;
-  //   }
-
-  //    if (role === Role.OWNER) {
-  // return res
-  //   .status(403)
-  //   .json({ error: "Cannot assign OWNER role" });
-  //  }
 
 
-  // 4️⃣ Validate + lock down role (OWNER-only route)
-let safeRole: Role;
+    //   let safeRole: Role = Role.EDITOR;
 
-// if (role === Role.OWNER) {
-//   return res.status(403).json({
-//     error: "Cannot assign OWNER role"
-//   });
-// }
+    //   if(role === Role.VIEWER){
+    //        safeRole = Role.VIEWER;
+    //   }
 
-if (role === Role.EDITOR) {
-  safeRole = Role.EDITOR;
-} else if (role === Role.VIEWER) {
-  safeRole = Role.VIEWER;
-} else {
-  return res.status(400).json({
-    error: "Invalid role. Only EDITOR or VIEWER allowed."
-  });
-}
+    //    if (role === Role.OWNER) {
+    // return res
+    //   .status(403)
+    //   .json({ error: "Cannot assign OWNER role" });
+    //  }
 
- 
+
+    // 4️⃣ Validate + lock down role (OWNER-only route)
+    let safeRole: Role;
+
+    // if (role === Role.OWNER) {
+    //   return res.status(403).json({
+    //     error: "Cannot assign OWNER role"
+    //   });
+    // }
+
+    if (role === Role.EDITOR) {
+      safeRole = Role.EDITOR;
+    } else if (role === Role.VIEWER) {
+      safeRole = Role.VIEWER;
+    } else {
+      return res.status(400).json({
+        error: "Invalid role. Only EDITOR or VIEWER allowed."
+      });
+    }
+
+
 
 
     // 4️⃣ Create permission
@@ -298,7 +298,7 @@ if (role === Role.EDITOR) {
         boardId,
         userId: userToInvite.id,
         // role: role ?? Role.EDITOR
-        role:safeRole
+        role: safeRole
       }
     });
 

@@ -151,7 +151,7 @@ async function start() {
             const created = await prisma.element.create({
               data: {
                 boardId,
-                type: element.type,
+                type: element.type.toUpperCase(),
                 data: element.data,
               },
             });
@@ -194,12 +194,7 @@ async function start() {
 
             const updated = await prisma.element.update({
               where: { id: elementId },
-              data: { data:{
-                x: data.x,
-                y: data.y,
-                width: data.width,
-                height: data.height
-              } },
+              data: { data: data },
             });
 
             const room = rooms.get(boardId);
