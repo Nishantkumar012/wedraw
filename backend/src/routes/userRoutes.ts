@@ -51,6 +51,7 @@ router.post("/register", async (req, res) => {
          
 });
 
+
 /**
  * POST /users/login
  * Body: { email, password }
@@ -98,7 +99,7 @@ router.post("/register", async (req, res) => {
 
 
 
-                router.get("/me", authMiddleware, async (req, res) => {
+             router.get("/me", authMiddleware, async (req, res) => {
                             try {
                                 const user = await prisma.user.findUnique({
                                 where: { id: req.userId },

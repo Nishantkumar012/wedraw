@@ -2,7 +2,6 @@ import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { authMiddleware } from "../authmiddleware/auth.js";
 import { Role } from "../../generated/prisma/enums";
-import { permission } from "node:process";
 
 const router = Router();
 
@@ -12,6 +11,7 @@ const router = Router();
 router.get("/health", (req, res) => {
   res.json({ ok: true, message: "Boards API working" });
 });
+
 
 /**
  * 🔹 Create Board (protected)
@@ -94,8 +94,11 @@ router.get("/me", authMiddleware, async (req, res) => {
       where: { userId },
       include: { board: true }
     });
+     
+    // console.log(permissions);
 
-    res.json(permissions.map(p => p.board));
+    // res.json(permissions.map(p => p.board));
+    res.json(permissions)
   } catch (error) {
     console.error("Error fetching boards", error);
     res.status(500).json({ error: "Failed to fetch boards" });
@@ -208,180 +211,135 @@ router.post("/:boardId/elements", authMiddleware, async (req, res) => {
  * 🔹 Invite user to board (OWNER only)
  */
 
+
+
 router.post("/:boardId/invite", authMiddleware, async (req, res) => {
-  const { boardId } = req.params;
-  const { email, role } = req.body;
-  const ownerId = req.userId!;
-
-  if (!email) {
-    return res.status(400).json({ error: "Email is required" });
-  }
-
   try {
-    // 1️⃣ Check requester is OWNER
-    const ownerPermission = await prisma.permission.findFirst({
+    const { boardId } = req.params;
+    const { email, role } = req.body;
+    const ownerId = req.userId!;
+
+    // -------------------------
+    // 1️⃣ Basic validation
+    // -------------------------
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    if (!role) {
+      return res.status(400).json({ error: "Role is required" });
+    }
+
+    // normalize role
+    const normalizedRole = role.trim().toUpperCase();
+
+    // -------------------------
+    // 2️⃣ Check board exists
+    // -------------------------
+    const board = await prisma.board.findUnique({
+      where: { id: boardId }
+    });
+
+    if (!board) {
+      return res.status(404).json({ error: "Board not found" });
+    }
+
+    // -------------------------
+    // 3️⃣ Check owner access
+    // -------------------------
+    const ownerPermission = await prisma.permission.findUnique({
       where: {
-        boardId,
-        userId: ownerId,
-        role: Role.OWNER
+        userId_boardId: {
+          userId: ownerId,
+          boardId
+        }
       }
     });
 
-    if (!ownerPermission) {
-      return res.status(403).json({ error: "Only owner can invite users" });
+    const isOwner =
+      board.ownerId === ownerId ||
+      ownerPermission?.role === Role.OWNER;
+
+    if (!isOwner) {
+      return res.status(403).json({
+        error: "Only owner can invite users"
+      });
     }
 
+    // -------------------------
+    // 4️⃣ Validate role
+    // -------------------------
+    if (!Object.values(Role).includes(normalizedRole)) {
+      return res.status(400).json({
+        error: "Invalid role"
+      });
+    }
 
+    if (normalizedRole === Role.OWNER) {
+      return res.status(403).json({
+        error: "Cannot assign OWNER role"
+      });
+    }
 
+    const safeRole = normalizedRole as Role;
 
-    // 2️⃣ Find user by email
+    // -------------------------
+    // 5️⃣ Find user
+    // -------------------------
     const userToInvite = await prisma.user.findUnique({
       where: { email }
     });
 
     if (!userToInvite) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({
+        error: "User not found"
+      });
     }
 
-    // 3️⃣ Prevent duplicate permission
-    const existingPermission = await prisma.permission.findFirst({
+    // -------------------------
+    // 6️⃣ Prevent duplicate
+    // -------------------------
+    const existingPermission = await prisma.permission.findUnique({
       where: {
-        boardId,
-        userId: userToInvite.id
+        userId_boardId: {
+          userId: userToInvite.id,
+          boardId
+        }
       }
     });
 
     if (existingPermission) {
-      return res.json({ message: "User already has access" });
-    }
-
-
-
-    //   let safeRole: Role = Role.EDITOR;
-
-    //   if(role === Role.VIEWER){
-    //        safeRole = Role.VIEWER;
-    //   }
-
-    //    if (role === Role.OWNER) {
-    // return res
-    //   .status(403)
-    //   .json({ error: "Cannot assign OWNER role" });
-    //  }
-
-
-    // 4️⃣ Validate + lock down role (OWNER-only route)
-    let safeRole: Role;
-
-    // if (role === Role.OWNER) {
-    //   return res.status(403).json({
-    //     error: "Cannot assign OWNER role"
-    //   });
-    // }
-
-    if (role === Role.EDITOR) {
-      safeRole = Role.EDITOR;
-    } else if (role === Role.VIEWER) {
-      safeRole = Role.VIEWER;
-    } else {
-      return res.status(400).json({
-        error: "Invalid role. Only EDITOR or VIEWER allowed."
+      return res.json({
+        message: "User already has access"
       });
     }
 
-
-
-
-    // 4️⃣ Create permission
+    // -------------------------
+    // 7️⃣ Create permission
+    // -------------------------
     const permission = await prisma.permission.create({
       data: {
         boardId,
         userId: userToInvite.id,
-        // role: role ?? Role.EDITOR
         role: safeRole
       }
     });
 
-    res.json({
+    // -------------------------
+    // ✅ Response
+    // -------------------------
+    return res.json({
       message: "User invited successfully",
       permission
     });
 
   } catch (error) {
-    console.error("Invite error", error);
-    res.status(500).json({ error: "Failed to invite user" });
+    console.error("Invite error:", error);
+    return res.status(500).json({
+      error: "Failed to invite user"
+    });
   }
 });
-
-
-
-// router.post("/:boardId/invite", authMiddleware, async (req, res) => {
-//   const { boardId } = req.params;
-//   const { email, role } = req.body;
-//   const userId = req.userId!;
-
-//   if (!email || !role) {
-//     return res.status(400).json({ error: "Email and role are required" });
-//   }
-
-//   try {
-//     // 1️⃣ Find caller’s permission on this board
-//     const permission = await prisma.permission.findFirst({
-//       where: {
-//         boardId,
-//         userId,
-//       },
-//     });
-
-//     if (!permission) {
-//       return res.status(403).json({ error: "No access to this board" });
-//     }
-
-//     // 2️⃣ Only OWNER can invite
-//     if (permission.role !== "OWNER") {
-//       return res
-//         .status(403)
-//         .json({ error: "Only owners can invite users" });
-//     }
-
-//     // 3️⃣ Find invitee user
-//     const invitee = await prisma.user.findUnique({
-//       where: { email },
-//     });
-
-//     if (!invitee) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     // 4️⃣ Prevent duplicate permission
-//     const existing = await prisma.permission.findFirst({
-//       where: {
-//         boardId,
-//         userId: invitee.id,
-//       },
-//     });
-
-//     if (existing) {
-//       return res
-//         .status(400)
-//         .json({ error: "User already has access" });
-//     }
-
-//     // 5️⃣ Create permission
-//     const newPermission = await prisma.permission.create({
-//       data: {
-//         boardId,
-//         userId: invitee.id,
-//         role,
-//       },
-//     });
-
-//     res.json({ success: true, permission: newPermission });
-//   } catch (err) {
-//     console.error("Invite error:", err);
-//     res.status(500).json({ error: "Failed to invite user" });
-//   }
-// });
 
 
 
