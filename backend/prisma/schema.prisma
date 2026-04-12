@@ -45,7 +45,7 @@ model User {
 model Board {
   id           String @id @default(uuid())
   title        String
-  owner        User   @relation("OwnedBoards", fields: [ownerId], references: [id])
+  owner        User   @relation("OwnedBoards", fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId      String
   elements     Element[]
   sessions     Session[]
@@ -57,9 +57,9 @@ model Board {
 
 model Session {
   id            String   @id @default(uuid())
-  board         Board    @relation(fields: [boardId], references: [id])
+  board         Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId       String
-  user          User?    @relation(fields: [userId],  references: [id])
+  user          User?    @relation(fields: [userId],  references: [id], onDelete: SetNull)
   userId        String?  
   startedAt     DateTime @default(now())
   endedAt       DateTime?
@@ -67,7 +67,7 @@ model Session {
 
 model Element {
   id          String       @id @default(uuid())
-  board       Board        @relation(fields: [boardId], references: [id])
+  board       Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId     String
   type        ElementType
   data        Json
@@ -78,7 +78,7 @@ model Element {
 
 model ElementVersion {
   id          String    @id @default(uuid())
-  element     Element   @relation(fields: [elementId], references: [id])
+  element     Element   @relation(fields: [elementId], references: [id], onDelete: Cascade)
   elementId   String
   data        Json
   version     Int
@@ -87,9 +87,9 @@ model ElementVersion {
 
 model Permission {
   id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  board     Board    @relation(fields: [boardId], references: [id])
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId   String
   role      Role
   createdAt DateTime @default(now())
@@ -99,9 +99,9 @@ model Permission {
 
 model Operation {
   id        String    @id @default(uuid())
-  board     Board     @relation(fields: [boardId], references: [id])
+  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId   String
-  user      User?     @relation(fields: [userId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId    String?
   type      String
   payload   Json

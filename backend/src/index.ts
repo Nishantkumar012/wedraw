@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { WebSocketServer, WebSocket } from "ws";
 import { prisma } from "./lib/prisma";
 import { app } from "./app";
+// import 'dotenv/config'
 
  //this is index.ts
 

@@ -31,6 +31,7 @@ app.use("/dev",devRoutes);
 
 
 app.get("/", (req,res) => {
+    //  console.log(process.env.DATABASE_URL)
     res.send("Hello From express");
 })
 

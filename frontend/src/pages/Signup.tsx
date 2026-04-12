@@ -138,7 +138,7 @@ export default function Signup() {
 
         <p style={{ fontSize: "0.9rem", opacity: 0.8 }}>
           Already have an account?{" "}
-          <Link to="/signin" style={{ color: "#60a5fa" }}>
+          <Link to="/login" style={{ color: "#60a5fa" }}>
             Sign in
           </Link>
         </p>
