@@ -4,6 +4,7 @@ import { useBoardStore } from '../../../store/useBoardStore';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { api } from '../../../services/api';
 import type { ShapeData } from '../../../types';
+import { throttle} from "lodash"
 
 export const Canvas = () => {
     const { boardId } = useParams();
@@ -41,6 +42,9 @@ export const Canvas = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [elements, currentShape, selectedElementId]);
+
+
+
 
     // Initial Fetch & WebSocket Setup
     useEffect(() => {
@@ -100,7 +104,7 @@ export const Canvas = () => {
         };
     }, [boardId, userToken, guestToken, setElements, addElement]);
 
-    // Hit Testing logic for selection
+    // Hit Testing logic for selection deciding if inside or outside shape
     const hitTest = (x: number, y: number, element: ShapeData) => {
         const { type, data } = element;
 
@@ -128,7 +132,17 @@ export const Canvas = () => {
             return x >= minX && x <= maxX && y >= minY && y <= maxY;
         }
         return false;
+    } 
+
+
+     // throttling the dragging ,stream line it
+    const throttledSend = useRef(
+  throttle((payload) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(payload));
     }
+  }, 50) // 🔥 50ms best
+).current;
 
     // Redraw loop
     const drawElements = () => {
@@ -192,6 +206,8 @@ export const Canvas = () => {
         });
     };
 
+    
+
     useEffect(() => {
         drawElements();
     }, [elements, currentShape, selectedElementId, activeTool]);
@@ -231,6 +247,8 @@ export const Canvas = () => {
         setCurrentShape(newShape);
     };
 
+
+
     const handlePointerMove = (e: React.PointerEvent) => {
         if (!isDrawing) return;
         const rect = canvasRef.current?.getBoundingClientRect();
@@ -244,30 +262,49 @@ export const Canvas = () => {
             const dy = y - dragOffset.y;
 
             const el = elements.find(el => el.id === selectedElementId);
+            
+            
             if (!el) return;
 
-            const newData = structuredClone(el.data);
+         // cpu heavy task   
+            // const newData = structuredClone(el.data);
+             
+            const newData = {...el.data};
+
+            //  console.log("el ka----> ", el , "el ka data --------->", el.data);
+            //  console.log(newData);
 
             if ((el.type === 'rectangle' || el.type === 'circle') && newData.x !== undefined) {
                 newData.x += dx;
                 newData.y! += dy;
-            } else if ((el.type === 'pencil' || el.type === 'line') && newData.points) {
-                newData.points = newData.points.map(p => ({ x: p.x + dx, y: p.y + dy }));
+            } else if ((el.type === 'pencil' || el.type === 'line') && el.data.points) {
+                //  newData.points = newData.points.map(p => ({ x: p.x + dx, y: p.y + dy }));
+                 newData.points = el.data.points.map(p => ({ x: p.x + dx, y: p.y + dy }));
+                
             }
 
             useBoardStore.getState().updateElement(selectedElementId, { data: newData });
             setDragOffset({ x, y });
 
             if (wsRef.current?.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify({
+                // wsRef.current.send(JSON.stringify({
+                //     action: "element_dragging",
+                //     boardId: el.boardId,
+                //     elementId: el.id,
+                //     data: newData
+                // }));
+
+                
+                                throttledSend({
                     action: "element_dragging",
                     boardId: el.boardId,
                     elementId: el.id,
                     data: newData
-                }));
+                });
             }
             return;
         }
+
 
         // DRAW LOGIC
         if (!currentShape) return;
@@ -285,6 +322,7 @@ export const Canvas = () => {
         setCurrentShape(updatedShape);
     };
 
+
     const handlePointerUp = () => {
         if (!isDrawing) return;
         setIsDrawing(false);
@@ -299,6 +337,7 @@ export const Canvas = () => {
                     elementId: el.id,
                     data: el.data
                 }));
+
             }
             setDragOffset(null);
             return;
@@ -349,3 +388,8 @@ export const Canvas = () => {
         </div>
     );
 };
+
+// function throttle(arg0: (payload: any) => void, arg1: number): any {
+//     throw new Error('Function not implemented.');
+// }
+
