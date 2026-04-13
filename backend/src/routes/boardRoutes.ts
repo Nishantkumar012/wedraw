@@ -98,6 +98,7 @@ router.get("/me", authMiddleware, async (req, res) => {
     // console.log(permissions);
 
     // res.json(permissions.map(p => p.board));
+    // console.log(permissions);
     res.json(permissions)
   } catch (error) {
     console.error("Error fetching boards", error);

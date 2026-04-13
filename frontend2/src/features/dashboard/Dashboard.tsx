@@ -12,6 +12,7 @@ export const Dashboard = () => {
     const [isCreating, setIsCreating] = useState(false);
     const [newBoardTitle, setNewBoardTitle] = useState('');
 
+
     useEffect(() => {
         fetchBoards();
     }, []);
@@ -133,12 +134,16 @@ export const Dashboard = () => {
 
                     {boards.map((board) => (
                         <div
-                            key={board.id}
+                            key={board.boardId}
+                            
                             className="flex flex-col p-6 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-lg cursor-pointer bg-white transition duration-200"
-                            onClick={() => navigate(`/board/${board.id}`)}
+                            onClick={() => navigate(`/board/${board.boardId}`,{
+                                state: { role: board.role}
+                            })}
                         >
+                            
                             <h3 className="text-xl font-semibold text-gray-800 mb-2 truncate" title={board.title}>{board.title}</h3>
-                            <p className="text-xs font-mono text-gray-400 mt-auto pt-4 border-t border-gray-100">ID: {board.id}</p>
+                            <p className="text-xs font-mono text-gray-400 mt-auto pt-4 border-t border-gray-100">ID: {board.boardId}</p>
                         </div>
                     ))}
                 </div>
