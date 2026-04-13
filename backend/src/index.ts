@@ -107,6 +107,11 @@ async function start() {
             const permission = await prisma.permission.findFirst({
               where: { userId: ws.userId, boardId },
             });
+                
+
+            console.log("WS USER:", ws.userId);
+console.log("BOARD:", boardId);
+              console.log("permission", permission);
 
             if (!permission) {
               console.log("🚫 Access denied:", boardId);

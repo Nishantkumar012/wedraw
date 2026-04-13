@@ -3,8 +3,12 @@ import { useParams, useSearchParams, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { Canvas } from '../../components/whiteboard/Canvas';
+// import { useLocation } from 'react-router-dom';
+
 
 export const BoardView = () => {
+
+  
     const { boardId } = useParams();
     const [searchParams] = useSearchParams();
     const guestTokenParam = searchParams.get('guestToken');
