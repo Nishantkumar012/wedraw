@@ -19,6 +19,7 @@ export const Sidebar = () => {
   const { activeTool, setTool, clearBoard } = useBoardStore();
 
   const { state } = useLocation();
+  // console.log("m hu side bar m", useLocation());
   const role = state?.role || "VIEWER";
 
   const { boardId } = useParams();
@@ -64,7 +65,8 @@ export const Sidebar = () => {
 
       console.log(res);
 
-      showToast("Invite sent ✅", "success");
+      // showToast("Invite sent ✅", "success");
+      showToast(res.data.message,"success")
 
       setIsInviteOpen(false);
       setEmail("");

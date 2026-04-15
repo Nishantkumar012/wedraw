@@ -297,6 +297,8 @@ router.post("/:boardId/invite", authMiddleware, async (req, res) => {
       });
     }
 
+      //  console.log("exist ke first me")
+
     // -------------------------
     // 6️⃣ Prevent duplicate
     // -------------------------
@@ -307,9 +309,12 @@ router.post("/:boardId/invite", authMiddleware, async (req, res) => {
           boardId
         }
       }
+      
     });
+    // console.log("exist ke  mid m")
 
     if (existingPermission) {
+      //  console.log("exist ke last me")
       return res.json({
         message: "User already has access"
       });
