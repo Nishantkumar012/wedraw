@@ -14,6 +14,7 @@ import type { ShapeType } from '../../../types';
 import { useLocation, useParams } from 'react-router-dom';
 import { api } from '../../../services/api';
 import type { AxiosError } from 'axios';
+// import './../../../App.css'
 
 export const Sidebar = () => {
   const { activeTool, setTool, clearBoard } = useBoardStore();
@@ -34,6 +35,9 @@ export const Sidebar = () => {
     type: "success" | "error";
   } | null>(null);
 
+  // const [toast, setToast] = useState(null);
+const [isExiting, setIsExiting] = useState(false);
+
   const tools: { id: ShapeType | 'select'; icon: React.ReactNode; label: string }[] = [
     { id: 'select', icon: <MousePointer2 size={20} />, label: 'Select' },
     { id: 'pencil', icon: <Pencil size={20} />, label: 'Pencil' },
@@ -42,12 +46,26 @@ export const Sidebar = () => {
     { id: 'line', icon: <Minus size={20} />, label: 'Line' },
   ];
 
+  // const showToast = (message: string, type: "success" | "error") => {
+  //   setToast({ message, type });
+  //   setTimeout(() => setToast(null), 3000);
+  // };
+
+
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    setIsExiting(false);
+
+    setTimeout(() => {
+      setIsExiting(true);
+      setTimeout(() => {
+        setToast(null);
+        setIsExiting(false);
+      }, 400);
+    }, 3000);
   };
 
-  const sendInvite = async (e?: React.FormEvent) => {
+  const sendInvite = async (e?: React.SyntheticEvent) => {
     if (e) e.preventDefault();
 
     if (!email.trim()) {
@@ -75,12 +93,10 @@ export const Sidebar = () => {
 
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
-
       showToast(
         axiosError?.response?.data?.message || "Something went wrong ❌",
         "error"
       );
-
       console.log("error", error);
     } finally {
       setLoading(false);
@@ -89,18 +105,32 @@ export const Sidebar = () => {
 
   return (
     <>
-      {/* 🔥 Toast */}
-      {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[300px]">
-          <div
-            className={`px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium relative overflow-hidden
-            ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
-          >
-            {toast.message}
-            <div className="absolute bottom-0 left-0 h-1 bg-white/70 animate-progress"></div>
-          </div>
-        </div>
-      )}
+    
+    
+    
+
+
+
+{toast && (
+  <div className="fixed top-10 left-0 right-0 flex justify-center z-[999] pointer-events-none">
+    <div
+      className={`
+        w-[320px] px-4 py-3 rounded-xl shadow-2xl text-white font-semibold relative overflow-hidden
+        ${isExiting ? "toast-exit" : "toast-enter"} 
+        ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}
+      `}
+    >
+      <div className="flex items-center gap-2">
+        {toast.type === "success" ? "✅" : "❌"}
+        <span>{toast.message}</span>
+      </div>
+
+      {/* Progress Bar Layer */}
+      <div className="absolute bottom-0 left-0 h-1 bg-white/40 toast-progress" />
+    </div>
+  </div>
+)}
+
 
       <aside className="w-16 h-full bg-white border-r border-gray-200 flex flex-col items-center py-4 gap-4 shadow-sm z-10">
         

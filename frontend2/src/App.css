@@ -5,25 +5,56 @@
 }
 
 
-@keyframes progress {
-  from {
-    width: 100%;
+
+/* ✨ Smooth Entrance: Left se Right (Center tak) */
+/* ✨ Left se enter hoga */
+/* Custom Animations */
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
   }
-  to {
-    width: 0%;
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-.animate-progress {
-  animation: progress 3s linear forwards;
+@keyframes slideOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
 }
 
+@keyframes progressBar {
+  0% { width: 100%; }
+  100% { width: 0%; }
+}
 
+/* Classes - Direct Name Rakhein taaki Tailwind se takraye nahi */
+.toast-enter {
+  animation: slideInLeft 1s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+.toast-exit {
+  animation: slideOutRight 1s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+.toast-progress {
+  animation: progressBar 3s linear forwards !important;
+}
+
+/* 
 @theme {
   --color-primary: #ec5b13;
   --color-background-light: #f8f6f6;
   --color-background-dark: #221610;
-}
+} */
 
 
 
