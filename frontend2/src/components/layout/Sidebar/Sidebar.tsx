@@ -57,7 +57,8 @@ export const Sidebar = () => {
 
     try {
       setLoading(true);
-
+      
+      console.log("random");
       const res = await api.post(`/boards/${boardId}/invite`, {
         email,
         role: inviteRole,
