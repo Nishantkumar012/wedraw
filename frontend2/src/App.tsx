@@ -5,6 +5,10 @@ import { Dashboard } from './features/dashboard/Dashboard';
 import { BoardView } from './features/board/BoardView';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { PublicRoute } from './routes/PublicRoute';
+import './App.css'
+// import './index.css'
+
+
 
 function App() {
   return (
