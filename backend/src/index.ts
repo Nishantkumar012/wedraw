@@ -3,7 +3,7 @@ import http from "http";
 import jwt from "jsonwebtoken";
 import { WebSocketServer, WebSocket } from "ws";
 import { prisma } from "./lib/prisma.js";
-import { app } from "./app";
+import { app } from "./app.js";
 // import {app} from "./app"
 // import 'dotenv/config'
 

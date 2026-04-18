@@ -1,6 +1,6 @@
 import express from 'express';
 // import cors from 'cors';
-import {prisma} from "./lib/prisma"
+// import {prisma} from "./lib/prisma"
 import boardRoutes from "./routes/boardRoutes"
 import userRoutes from "./routes/userRoutes"
 import devRoutes from "./routes/devRoutes"
