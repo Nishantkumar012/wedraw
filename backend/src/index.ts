@@ -283,7 +283,7 @@ console.log("BOARD:", boardId);
       });
     });
 
-    httpServer.listen(PORT, () => {
+    httpServer.listen(PORT, "0.0.0.0",() => {
       console.log(`🚀 Server + WS running on http://localhost:${PORT}`);
     });
   } catch (err) {
