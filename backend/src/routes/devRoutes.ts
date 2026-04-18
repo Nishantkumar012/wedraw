@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import { prisma } from "../lib/prisma.js";
 import { authMiddleware } from "../authmiddleware/auth.js";
-import { Role } from "../../generated/prisma/enums";
+import { Role } from "@prisma/client";
 
 
 

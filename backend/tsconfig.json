@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": "src",
+    "outDir": "dist",
 
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -15,5 +15,6 @@
     "skipLibCheck": true,
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*","prisma/generated/**/*"],
+  "exclude": ["node_modules", "dist", "prisma.config.ts", "generated", "prisma"]
 }

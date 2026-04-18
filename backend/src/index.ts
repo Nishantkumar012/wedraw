@@ -2,8 +2,9 @@ import "dotenv/config";
 import http from "http";
 import jwt from "jsonwebtoken";
 import { WebSocketServer, WebSocket } from "ws";
-import { prisma } from "./lib/prisma";
+import { prisma } from "./lib/prisma.js";
 import { app } from "./app";
+// import {app} from "./app"
 // import 'dotenv/config'
 
  //this is index.ts
@@ -284,6 +285,7 @@ console.log("BOARD:", boardId);
     });
 
     httpServer.listen(PORT, "0.0.0.0",() => {
+      // console.log(process.env.DATABASE_URL)
       console.log(`🚀 Server + WS running on http://localhost:${PORT}`);
     });
   } catch (err) {
