@@ -1,9 +1,12 @@
+
+
 import "dotenv/config";
 import http from "http";
 import jwt from "jsonwebtoken";
 import { WebSocketServer, WebSocket } from "ws";
-import { prisma } from "./lib/prisma.js";
-import { app } from "./app.js";
+import { prisma } from "./lib/prisma";
+import { app } from "./app";
+
 // import {app} from "./app"
 // import 'dotenv/config'
 
@@ -12,12 +15,17 @@ import { app } from "./app.js";
 // ─────────────────────────────────────────────
 // Extend WebSocket type
 // ─────────────────────────────────────────────
-declare module "ws" {
-  interface WebSocket {
-    userId?: string;
-    boardId?: string;
-  }
-}
+// declare module "ws" {
+//   interface WebSocket {
+//     userId?: string;
+//     boardId?: string;
+//   }
+// }
+
+type WS = WebSocket & {
+  userId?: string;
+  boardId?: string;
+};
 
 const PORT = 3000;
 
@@ -32,7 +40,7 @@ async function start() {
     const httpServer = http.createServer(app);
     const wss = new WebSocketServer({ server: httpServer });
 
-    wss.on("connection", async (ws, req) => {
+    wss.on("connection", async (ws: WS, req) => {
       console.log("🔌 WebSocket connected");
 
       // ─────────────────────────────────────────
