@@ -35,5 +35,9 @@ app.get("/", (req,res) => {
     res.send("Hello From express");
 })
 
+app.get("/health", (req,res)=>{
+      res.send("wedraw working fine")
+})
+
 
 export {app};
