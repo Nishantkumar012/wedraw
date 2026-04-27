@@ -9,7 +9,9 @@ export const api = axios.create({
         'Content-Type': 'application/json',
     },
 });
+ 
 
+  console.log(import.meta.env.VITE_API_URL)
 api.interceptors.request.use(
     (config) => {
         // We fetch tokens directly from localStorage/sessionStorage instead of the store to avoid cyclic dependency issues

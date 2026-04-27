@@ -20,6 +20,7 @@ export const Dashboard = () => {
     const fetchBoards = async () => {
         try {
             const res = await api.get('/boards/me');
+            console.log(res)
             setBoards(res.data);
         } catch (error) {
             console.error('Failed to fetch boards', error);
