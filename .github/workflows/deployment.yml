@@ -33,7 +33,7 @@ jobs:
       - name: Deploy frontend to s3
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --acl public-read --follow-symlinks --delete
+          args: --delete
         env:
           AWS_S3_BUCKET: we-draw
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
