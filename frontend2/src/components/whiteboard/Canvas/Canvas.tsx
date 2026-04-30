@@ -62,6 +62,7 @@ export const Canvas = () => {
                 }));
                 setElements(loadedElements);
                 console.log("for testing on s3 in canvas",res)
+                console.log(api+`/boards/${boardId}/elements`)
             })
             .catch(err => console.error('Failed to fetch elements', err));
 
