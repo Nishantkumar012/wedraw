@@ -158,10 +158,7 @@ console.log("BOARD:", boardId);
             const { boardId, element } = msg;
             if (!boardId || !element?.data) return;
 
-            const permission = await prisma.permission.findFirst({
-              where: { userId: ws.userId, boardId },
-            });
-            if (!permission) return;
+            if (ws.boardId !== boardId) return;
 
             const created = await prisma.element.create({
               data: {
@@ -202,10 +199,7 @@ console.log("BOARD:", boardId);
             const { boardId, elementId, data } = msg;
             if (!boardId || !elementId || !data) return;
 
-            const permission = await prisma.permission.findFirst({
-              where: { userId: ws.userId, boardId },
-            });
-            if (!permission) return;
+            if (ws.boardId !== boardId) return;
 
             const updated = await prisma.element.update({
               where: { id: elementId },
@@ -238,14 +232,7 @@ console.log("BOARD:", boardId);
 
                     if(!boardId || !elementId || !data) return;
 
-                    const permission = await prisma.permission.findFirst({
-                        where:{
-                            userId:ws.userId,
-                            boardId
-                        }
-                    })
-
-                      if(!permission) return;
+                    if (ws.boardId !== boardId) return;
 
                       const room = rooms.get(boardId);
                       if(!room ) return;
