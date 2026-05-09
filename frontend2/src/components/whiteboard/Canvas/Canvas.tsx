@@ -66,7 +66,10 @@ export const Canvas = () => {
             })
             .catch(err => console.error('Failed to fetch elements', err));
 
-        const ws = new WebSocket(`ws://localhost:3000?token=${token}`);
+            // http/ change to ws to connect websocket
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const wsUrl = apiUrl.replace(/^http/, 'ws');
+        const ws = new WebSocket(`${wsUrl}?token=${token}`);
         wsRef.current = ws;
 
         ws.onopen = () => {
