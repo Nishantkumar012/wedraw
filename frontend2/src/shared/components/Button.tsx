@@ -18,7 +18,7 @@ export const Button = ({
   const base = "rounded-md font-medium transition";
 
   const variants = {
-    primary: "bg-primary text-white hover:bg-orange-700",
+    primary: "bg-blue-600 text-white hover:bg-blue-700",
     secondary: "bg-gray-200 text-black hover:bg-gray-300",
     ghost: "bg-transparent hover:bg-gray-100",
     danger: "bg-red-500 text-white hover:bg-red-600",
