@@ -71,6 +71,7 @@ export const Canvas = () => {
         const wsUrl = apiUrl.replace(/^http/, 'ws');
         const ws = new WebSocket(`${wsUrl}?token=${token}`);
         wsRef.current = ws;
+        console.log("ws is", ws)
 
         ws.onopen = () => {
             ws.send(JSON.stringify({ action: "join_board", boardId }));
