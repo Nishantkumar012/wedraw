@@ -56,6 +56,7 @@ router.post("/register", async (req, res) => {
  * POST /users/login
  * Body: { email, password }
  */
+   console.log("close to login")
             router.post("/login", async (req, res) => {
                 
                  const {email,password} = req.body;

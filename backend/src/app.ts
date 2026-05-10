@@ -25,6 +25,7 @@ app.use(express.json());
 
 
 app.use("/boards",boardRoutes);
+console.log("going for user");
 app.use("/user",userRoutes);
 app.use("/dev",devRoutes);
 
