@@ -57,7 +57,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/wedraw/backend
+            cd ~/wedraw
 
             echo "Pull latest code"
             git pull origin main
