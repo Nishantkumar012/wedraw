@@ -21,7 +21,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-// this uis app.ts
+// this uis app.t s
 
 
 app.use("/boards",boardRoutes);
