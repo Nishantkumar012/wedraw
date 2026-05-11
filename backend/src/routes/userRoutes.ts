@@ -71,7 +71,8 @@ router.post("/register", async (req, res) => {
                      const user = await prisma.user.findUnique({
                            where:{email}
                      })
-
+             console.log("the user is ", user);
+                          
                      if(!user){
                          return res.status(404).json({error: "user does not exist"});
                      }
@@ -97,6 +98,7 @@ router.post("/register", async (req, res) => {
                                       return res.status(500).json({ error: "Server error" });
                      }
              });
+
 
 
 
