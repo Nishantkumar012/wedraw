@@ -62,6 +62,9 @@ jobs:
             echo "Pull latest code"
             git pull origin main
 
+            echo "Go to backend"
+            cd backend
+
             echo "Install dependencies"
             npm ci
 
