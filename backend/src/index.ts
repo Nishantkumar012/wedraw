@@ -35,6 +35,7 @@ const rooms = new Map<string, Set<WebSocket>>();
 async function start() {
   try {
     await prisma.$connect();
+    console.log("helllo from in");
     console.log("📦 Database connected");
 
     const httpServer = http.createServer(app);
