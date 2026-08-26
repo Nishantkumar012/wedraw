@@ -291,7 +291,7 @@ console.log("BOARD:", boardId);
 }
 
 start();
-console.log("hello")
+// console.log("hello")
 
 
 
