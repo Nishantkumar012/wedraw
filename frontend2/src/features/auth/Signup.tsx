@@ -21,7 +21,7 @@ function Signup() {
     e.preventDefault()
     setError("");
     try {
-      const res = await api.post("/user/signup", {
+      const res = await api.post("/user/register", {
         name: form.name,
         email: form.email,
         password: form.password,
