@@ -38,7 +38,7 @@ jobs:
       
       - name: Verify API URL
         run: |
-          grep -R "http://54.90.67.225:3000" dist
+          grep -R "http://3.87.198.44:3000" dist
 
       - name: Verify API URL
         run: |
