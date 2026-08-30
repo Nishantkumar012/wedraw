@@ -40,6 +40,10 @@ jobs:
         run: |
           grep -R "http://54.90.67.225:3000" dist
 
+      - name: Verify API URL
+        run: |
+          grep -R "3.87.198.44" dist || true    
+
       - name: Deploy frontend to s3
         uses: jakejarvis/s3-sync-action@master
         with:
