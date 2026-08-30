@@ -36,7 +36,7 @@ jobs:
          # The API base URL for the frontend to connect to the backend; injected at build time
          VITE_API_URL: ${{ secrets.VITE_API_URL }}
       
-       - name: Verify API URL
+      - name: Verify API URL
          run: |
           grep -R "http://54.90.67.225:3000" dist
 
