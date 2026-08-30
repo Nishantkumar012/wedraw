@@ -57,6 +57,7 @@ router.get("/:boardId/elements", authMiddleware, async (req, res) => {
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
+  
 
   try {
     const permission = await prisma.permission.findFirst({
