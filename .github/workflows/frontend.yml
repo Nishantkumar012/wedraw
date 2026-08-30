@@ -27,6 +27,11 @@ jobs:
 
       - name: Install dependencies
         run:  npm ci
+       
+      - name: Check API URL
+        run: echo "API URL = $VITE_API_URL"
+        env:
+           VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Build frontend
         run: npm run build
