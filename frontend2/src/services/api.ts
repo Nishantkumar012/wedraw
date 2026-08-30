@@ -16,6 +16,7 @@ export const api = axios.create({
 });
  
 
+
 //   console.log("ENV:", import.meta.env.VITE_API_URL)
 // console.log("BASE:", api.defaults.baseURL)
 api.interceptors.request.use(

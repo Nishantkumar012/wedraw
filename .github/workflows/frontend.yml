@@ -37,7 +37,7 @@ jobs:
          VITE_API_URL: ${{ secrets.VITE_API_URL }}
       
       - name: Verify API URL
-         run: |
+        run: |
           grep -R "http://54.90.67.225:3000" dist
 
       - name: Deploy frontend to s3
