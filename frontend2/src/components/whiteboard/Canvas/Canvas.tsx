@@ -372,7 +372,16 @@ export const Canvas = () => {
     };
 
     return (
-        <div ref={containerRef} className="flex-1 h-full bg-slate-50 relative overflow-hidden">
+        <div ref={containerRef} className="flex-1 h-full bg-[#EEF5F7] relative overflow-hidden">
+            {/* Canvas Grid Pattern */}
+            <div
+                className="absolute inset-0 opacity-10 pointer-events-none"
+                style={{
+                    backgroundImage: 'radial-gradient(circle at 1px 1px, #767683 1px, transparent 0)',
+                    backgroundSize: '24px 24px'
+                }}
+            />
+
             <canvas
                 ref={canvasRef}
                 className={`absolute top-0 left-0 touch-none ${activeTool === 'select' ? 'cursor-default' : 'cursor-crosshair'}`}
@@ -382,12 +391,16 @@ export const Canvas = () => {
                 onPointerLeave={handlePointerUp}
             />
 
-            <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-md shadow-sm border border-gray-200 text-sm font-medium text-gray-600">
-                Tool: <span className="capitalize">{activeTool}</span>
+            {/* Top Right: Active Tool Indicator */}
+            <div className="absolute top-4 right-4 bg-[#F4FAFD] px-4 py-2 rounded-full raised-neumorphic text-sm font-medium text-[#5B5F62] flex items-center gap-2">
+                <span className="text-[#4352A5] font-semibold">Tool:</span>
+                <span className="capitalize text-[#161D1F]">{activeTool}</span>
             </div>
 
+            {/* Selection Indicator */}
             {activeTool === 'select' && selectedElementId && (
-                <div className="absolute bottom-4 right-4 bg-blue-100 px-3 py-1 text-blue-700 text-sm font-medium rounded shadow-sm border border-blue-200">
+                <div className="absolute bottom-20 right-6 bg-[#4352A5] text-white px-4 py-2 text-sm font-medium rounded-full shadow-lg flex items-center gap-2">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                     Shape selected (Drag to move)
                 </div>
             )}
