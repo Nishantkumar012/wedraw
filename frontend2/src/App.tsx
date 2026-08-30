@@ -5,6 +5,7 @@ import { Dashboard } from './features/dashboard/Dashboard';
 import { BoardView } from './features/board/BoardView';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { PublicRoute } from './routes/PublicRoute';
+import Home from './Home';
 import './App.css'
 // import './index.css'
 
@@ -13,6 +14,9 @@ import './App.css'
 function App() {
   return (
     <Routes>
+      {/* Public Home/Landing Page */}
+      <Route path="/" element={<Home />} />
+
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -26,8 +30,7 @@ function App() {
       <Route path="/board/:boardId" element={<BoardView />} />
 
       {/* Fallbacks */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

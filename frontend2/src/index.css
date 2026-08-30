@@ -1,2 +1,51 @@
 @import "tailwindcss";
 
+/* Custom Neumorphic Utilities */
+.raised-neumorphic {
+  box-shadow: 8px 8px 18px rgba(163,177,198,0.4), -8px -8px 18px rgba(255,255,255,0.8);
+}
+
+.raised-neumorphic-pill {
+  box-shadow: 8px 8px 18px rgba(163,177,198,0.4), -8px -8px 18px rgba(255,255,255,0.8);
+  border-radius: 9999px;
+}
+
+.pressed-neumorphic {
+  box-shadow: inset 4px 4px 10px rgba(163,177,198,0.3), inset -4px -4px 10px rgba(255,255,255,0.7);
+}
+
+.sticky-yellow {
+  background-color: #FFF9C4;
+  box-shadow: 2px 4px 8px rgba(0,0,0,0.1);
+}
+
+.sticky-blue {
+  background-color: #B3E5FC;
+  box-shadow: 2px 4px 8px rgba(0,0,0,0.1);
+}
+
+.sticky-pink {
+  background-color: #F8BBD0;
+  box-shadow: 2px 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Animation for floating elements */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-anim {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes cursor-move {
+  0%, 100% { left: 45%; top: 30%; }
+  50% { left: 60%; top: 50%; }
+}
+
+.cursor-animate {
+  animation: cursor-move 8s ease-in-out infinite;
+}
+
