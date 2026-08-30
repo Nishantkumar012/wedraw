@@ -50,14 +50,16 @@ router.post("/", authMiddleware, async (req, res) => {
 // get all the shapes
 router.get("/:boardId/elements", authMiddleware, async (req, res) => {
 
-  const { boardId } = req.params;
+  // const { boardId } = req.params;
+
+  const  boardId  = req.params.boardId as string;
+
   const userId = req.userId;
 
   // console.log("I am in elements fetching routes");
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-  
 
   try {
     const permission = await prisma.permission.findFirst({
@@ -114,7 +116,11 @@ router.get("/me", authMiddleware, async (req, res) => {
  * 🔹 Get a specific board (protected + permission check)
  */
 router.get("/:boardId", authMiddleware, async (req, res) => {
-  const { boardId } = req.params;
+  // const { boardId } = req.params;\
+
+  const  boardId  = req.params.boardId as string;
+
+  
   const userId = req.userId!;
 
   try {
@@ -146,7 +152,10 @@ router.get("/:boardId", authMiddleware, async (req, res) => {
  * 🔹 Update Board Meta (only Owner)
  */
 router.patch("/:boardId", authMiddleware, async (req, res) => {
-  const { boardId } = req.params;
+  // const { boardId } = req.params;
+
+  const  boardId  = req.params.boardId as string;
+
   const { title } = req.body;
   const userId = req.userId!;
 
@@ -177,7 +186,9 @@ router.patch("/:boardId", authMiddleware, async (req, res) => {
  * 🔹 Create Element in Board (protected)
  */
 router.post("/:boardId/elements", authMiddleware, async (req, res) => {
-  const { boardId } = req.params;
+  // const { boardId } = req.params;
+  const  boardId  = req.params.boardId as string;
+
   const { type, data } = req.body;
   const userId = req.userId!;
 
@@ -218,7 +229,10 @@ router.post("/:boardId/elements", authMiddleware, async (req, res) => {
 
 router.post("/:boardId/invite", authMiddleware, async (req, res) => {
   try {
-    const { boardId } = req.params;
+    // const { boardId } = req.params;
+
+  const  boardId  = req.params.boardId as string;
+
     const { email, role } = req.body;
     const ownerId = req.userId!;
 
