@@ -30,7 +30,7 @@ export const BoardView = () => {
     const guestTokenParam = searchParams.get('guestToken');
 
     const { isAuthenticated, guestToken, setGuestToken } = useAuthStore();
-    const { activeTool, setTool, clearBoard } = useBoardStore();
+    const { activeTool, setTool, clearBoard, activeColor, setColor } = useBoardStore();
 
     const { state } = useLocation();
     const role = state?.role || "VIEWER";
@@ -249,6 +249,28 @@ export const BoardView = () => {
                                 {tool.icon}
                             </button>
                         ))}
+
+                        {/* Divider */}
+                        <div className="w-8 h-px bg-[#E2E9EC] my-1" />
+
+                        {/* Color Palette */}
+                        <div className="flex flex-col items-center gap-2">
+                            {["#000000", "#FF0000", "#00AA00", "#0000FF", "#FFAA00", "#FF00FF", "#00AAAA"].map((color) => (
+                                <button
+                                    key={color}
+                                    onClick={() => setColor(color)}
+                                    className={`
+                                        w-7 h-7 rounded transition-all
+                                        ${activeColor === color
+                                            ? 'ring-2 ring-offset-2 ring-[#4352A5] scale-110'
+                                            : 'hover:scale-105'
+                                        }
+                                    `}
+                                    style={{ backgroundColor: color }}
+                                    title={color}
+                                />
+                            ))}
+                        </div>
 
                         {/* Divider */}
                         <div className="w-8 h-px bg-[#E2E9EC] my-1" />
