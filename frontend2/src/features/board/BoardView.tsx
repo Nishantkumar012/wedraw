@@ -31,6 +31,8 @@ export const BoardView = () => {
 
     const { isAuthenticated, guestToken, setGuestToken } = useAuthStore();
     const { activeTool, setTool, activeColor, setColor, selectedElementId } = useBoardStore();
+    const canUndo = useBoardStore(state => state.canUndo());
+    const canRedo = useBoardStore(state => state.canRedo());
 
     const canvasRef = useRef<CanvasRef>(null);
 
@@ -309,22 +311,48 @@ export const BoardView = () => {
 
                     {/* Bottom Floating Controls */}
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#F4FAFD] rounded-full px-6 py-3 raised-neumorphic-pill flex items-center gap-8 z-40">
-                        <button className="flex flex-col items-center text-[#5B5F62] hover:text-[#4352A5] cursor-pointer hover:scale-110 transition-transform">
+                        <button
+                            onClick={() => {
+                                console.log('Undo clicked, canUndo:', canUndo);
+                                if (canUndo) {
+                                    canvasRef.current?.handleUndo();
+                                }
+                            }}
+                            className={`flex flex-col items-center hover:scale-110 transition-transform ${
+                                canUndo
+                                    ? 'text-[#5B5F62] hover:text-[#4352A5] cursor-pointer'
+                                    : 'text-[#D0D5D7] cursor-not-allowed opacity-50'
+                            }`}
+                            title="Undo (Ctrl+Z)"
+                        >
                             <Undo2 className="w-5 h-5" strokeWidth={2.5} />
-                            <span className="text-[11px] leading-[1] tracking-[0.05em] font-semibold mt-1">Undo</span>
+                            <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Undo</span>
                         </button>
-                        <button className="flex flex-col items-center text-[#5B5F62] hover:text-[#4352A5] cursor-pointer hover:scale-110 transition-transform">
+                        <button
+                            onClick={() => {
+                                console.log('Redo clicked, canRedo:', canRedo);
+                                if (canRedo) {
+                                    canvasRef.current?.handleRedo();
+                                }
+                            }}
+                            className={`flex flex-col items-center hover:scale-110 transition-transform ${
+                                canRedo
+                                    ? 'text-[#5B5F62] hover:text-[#4352A5] cursor-pointer'
+                                    : 'text-[#D0D5D7] cursor-not-allowed opacity-50'
+                            }`}
+                            title="Redo (Ctrl+Y)"
+                        >
                             <Redo2 className="w-5 h-5" strokeWidth={2.5} />
-                            <span className="text-[11px] leading-[1] tracking-[0.05em] font-semibold mt-1">Redo</span>
+                            <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Redo</span>
                         </button>
                         <div className="w-px h-8 bg-[#E2E9EC]" />
                         <button className="flex flex-col items-center text-[#4352A5] font-bold cursor-pointer hover:scale-110 transition-transform">
                             <ZoomIn className="w-5 h-5" strokeWidth={2.5} />
-                            <span className="text-[11px] leading-[1] tracking-[0.05em] font-semibold mt-1">Zoom</span>
+                            <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Zoom</span>
                         </button>
                         <button className="flex flex-col items-center text-[#5B5F62] hover:text-[#4352A5] cursor-pointer hover:scale-110 transition-transform">
                             <ZoomOut className="w-5 h-5" strokeWidth={2.5} />
-                            <span className="text-[11px] leading-[1] tracking-[0.05em] font-semibold mt-1">Reset</span>
+                            <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Reset</span>
                         </button>
                     </div>
                 </main>

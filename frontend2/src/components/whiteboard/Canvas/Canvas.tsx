@@ -9,6 +9,8 @@ import { throttle} from "lodash"
 export interface CanvasRef {
     handleDelete: () => void;
     handleClearBoard: () => void;
+    handleUndo: () => void;
+    handleRedo: () => void;
 }
 
 export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
@@ -32,6 +34,11 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
     const addElement = useBoardStore(state => state.addElement);
     const deleteElement = useBoardStore(state => state.deleteElement);
     const setSelectedElement = useBoardStore(state => state.setSelectedElement);
+    const pushHistory = useBoardStore(state => state.pushHistory);
+    const undo = useBoardStore(state => state.undo);
+    const redo = useBoardStore(state => state.redo);
+    const canUndo = useBoardStore(state => state.canUndo);
+    const canRedo = useBoardStore(state => state.canRedo);
 
     const { userToken, guestToken } = useAuthStore();
 
@@ -55,6 +62,9 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
         if (activeTool === 'select' && selectedElementId) {
             const element = elements.find(el => el.id === selectedElementId);
             if (element) {
+                // Create history entry BEFORE deleting
+                pushHistory('element_deleted');
+
                 // Send to backend API
                 api.delete(`/boards/${element.boardId}/elements/${element.id}`)
                     .catch(err => console.error('Failed to delete element', err));
@@ -80,6 +90,9 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
 
         const currentElements = [...elements];
 
+        // Create history entry BEFORE clearing
+        pushHistory('clear_board');
+
         // Clear local state immediately (optimistic update)
         useBoardStore.getState().clearBoard();
 
@@ -103,15 +116,62 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
         }
     };
 
+    // Undo handler
+    const handleUndo = () => {
+        if (canUndo()) {
+            const prevState = useBoardStore.getState().history[useBoardStore.getState().historyIndex - 1];
+            undo();
+            // Persist undo to backend
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({
+                    action: "board_state_updated",
+                    boardId,
+                    elements: prevState.elements
+                }));
+            }
+        }
+    };
+
+    // Redo handler
+    const handleRedo = () => {
+        if (canRedo()) {
+            const nextState = useBoardStore.getState().history[useBoardStore.getState().historyIndex + 1];
+            redo();
+            // Persist redo to backend
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({
+                    action: "board_state_updated",
+                    boardId,
+                    elements: nextState.elements
+                }));
+            }
+        }
+    };
+
     // Expose handlers to parent via ref
     useImperativeHandle(ref, () => ({
         handleDelete,
-        handleClearBoard
+        handleClearBoard,
+        handleUndo,
+        handleRedo
     }));
 
-    // Keyboard listener for Delete/Backspace
+    // Keyboard listener for Delete/Backspace and Undo/Redo
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Undo: Ctrl+Z
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                handleUndo();
+                return;
+            }
+            // Redo: Ctrl+Y or Ctrl+Shift+Z
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+                e.preventDefault();
+                handleRedo();
+                return;
+            }
+            // Delete/Backspace
             if ((e.key === 'Delete' || e.key === 'Backspace') && activeTool === 'select' && selectedElementId) {
                 e.preventDefault();
                 handleDelete();
@@ -120,7 +180,7 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [activeTool, selectedElementId, elements, deleteElement, handleDelete]);
+    }, [activeTool, selectedElementId, elements, deleteElement, handleDelete, handleUndo, handleRedo]);
 
     useEffect(() => {
         const token = userToken || guestToken;
@@ -435,6 +495,7 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
         // Save locally optimistically
         const finalShape = { ...currentShape, isTemp: true };
         addElement(finalShape);
+        pushHistory('element_added');
 
         // Dispatch to backend
         if (wsRef.current?.readyState === WebSocket.OPEN) {
