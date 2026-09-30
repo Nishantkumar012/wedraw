@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useBoardStore } from '../../../store/useBoardStore';
 import { useAuthStore } from '../../../store/useAuthStore';
@@ -6,7 +6,12 @@ import { api } from '../../../services/api';
 import type { ShapeData } from '../../../types';
 import { throttle} from "lodash"
 
-export const Canvas = () => {
+export interface CanvasRef {
+    handleDelete: () => void;
+    handleClearBoard: () => void;
+}
+
+export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
     const { boardId } = useParams();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -25,6 +30,8 @@ export const Canvas = () => {
     const elements = useBoardStore(state => state.elements);
     const setElements = useBoardStore(state => state.setElements);
     const addElement = useBoardStore(state => state.addElement);
+    const deleteElement = useBoardStore(state => state.deleteElement);
+    const setSelectedElement = useBoardStore(state => state.setSelectedElement);
 
     const { userToken, guestToken } = useAuthStore();
 
@@ -43,10 +50,78 @@ export const Canvas = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, [elements, currentShape, selectedElementId]);
 
+    // Delete handler
+    const handleDelete = () => {
+        if (activeTool === 'select' && selectedElementId) {
+            const element = elements.find(el => el.id === selectedElementId);
+            if (element) {
+                // Send to backend API
+                api.delete(`/boards/${element.boardId}/elements/${element.id}`)
+                    .catch(err => console.error('Failed to delete element', err));
 
+                // Send WebSocket message
+                if (wsRef.current?.readyState === WebSocket.OPEN) {
+                    wsRef.current.send(JSON.stringify({
+                        action: "element_deleted",
+                        boardId: element.boardId,
+                        elementId: element.id,
+                    }));
+                }
+            }
+            deleteElement(selectedElementId);
+            setSelectedElementId(null);
+            setSelectedElement(null);
+        }
+    };
 
+    // Clear board handler
+    const handleClearBoard = () => {
+        if (!boardId) return;
 
-    // Initial Fetch & WebSocket Setup
+        const currentElements = [...elements];
+
+        // Clear local state immediately (optimistic update)
+        useBoardStore.getState().clearBoard();
+
+        // Delete all elements from backend
+        Promise.all(
+            currentElements.map(element =>
+                api.delete(`/boards/${boardId}/elements/${element.id}`)
+                    .catch(err => console.error('Failed to delete element', err))
+            )
+        ).catch(err => console.error('Failed to clear board', err));
+
+        // Send WebSocket message for each element
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+            currentElements.forEach(element => {
+                wsRef.current!.send(JSON.stringify({
+                    action: "element_deleted",
+                    boardId: element.boardId,
+                    elementId: element.id,
+                }));
+            });
+        }
+    };
+
+    // Expose handlers to parent via ref
+    useImperativeHandle(ref, () => ({
+        handleDelete,
+        handleClearBoard
+    }));
+
+    // Keyboard listener for Delete/Backspace
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.key === 'Delete' || e.key === 'Backspace') && activeTool === 'select' && selectedElementId) {
+                e.preventDefault();
+                handleDelete();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [activeTool, selectedElementId, elements, deleteElement, handleDelete]);
+
     useEffect(() => {
         const token = userToken || guestToken;
         if (!token || !boardId) return;
@@ -101,6 +176,8 @@ export const Canvas = () => {
                 }
             } else if (msg.action === "element_updated" || msg.action === "element_dragging") {
                 useBoardStore.getState().updateElement(msg.elementId, { data: msg.data });
+            } else if (msg.action === "element_deleted") {
+                useBoardStore.getState().deleteElement(msg.elementId);
             }
         };
 
@@ -229,16 +306,19 @@ export const Canvas = () => {
             for (let i = elements.length - 1; i >= 0; i--) {
                 if (hitTest(x, y, elements[i])) {
                     setSelectedElementId(elements[i].id);
+                    setSelectedElement(elements[i].id);
                     setDragOffset({ x, y });
                     setIsDrawing(true); // Hijack for 'isDragging'
                     return;
                 }
             }
             setSelectedElementId(null);
+            setSelectedElement(null);
             return;
         }
 
         setSelectedElementId(null);
+        setSelectedElement(null);
         setIsDrawing(true);
 
         const newShape: ShapeData = {
@@ -406,7 +486,9 @@ export const Canvas = () => {
             )}
         </div>
     );
-};
+});
+
+Canvas.displayName = 'Canvas';
 
 // function throttle(arg0: (payload: any) => void, arg1: number): any {
 //     throw new Error('Function not implemented.');

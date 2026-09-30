@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import { Canvas } from '../../components/whiteboard/Canvas';
+import { Canvas, type CanvasRef } from '../../components/whiteboard/Canvas';
 import { useBoardStore } from '../../store/useBoardStore';
 import {
     Pencil,
@@ -30,7 +30,9 @@ export const BoardView = () => {
     const guestTokenParam = searchParams.get('guestToken');
 
     const { isAuthenticated, guestToken, setGuestToken } = useAuthStore();
-    const { activeTool, setTool, clearBoard, activeColor, setColor } = useBoardStore();
+    const { activeTool, setTool, activeColor, setColor, selectedElementId } = useBoardStore();
+
+    const canvasRef = useRef<CanvasRef>(null);
 
     const { state } = useLocation();
     const role = state?.role || "VIEWER";
@@ -229,7 +231,7 @@ export const BoardView = () => {
 
                 {/* Main Canvas Area */}
                 <main className="flex-1 relative overflow-hidden">
-                    <Canvas />
+                    <Canvas ref={canvasRef} />
 
                     {/* Left Floating Toolbar */}
                     <div className="absolute left-6 top-1/2 -translate-y-1/2 w-16 bg-[#F4FAFD] rounded-xl raised-neumorphic flex flex-col items-center gap-3 py-4 z-40">
@@ -275,12 +277,30 @@ export const BoardView = () => {
                         {/* Divider */}
                         <div className="w-8 h-px bg-[#E2E9EC] my-1" />
 
+                        {/* Delete Button - Only show when element is selected in select mode */}
+                        {role !== "VIEWER" && activeTool === 'select' && selectedElementId && (
+                            <button
+                                onClick={() => {
+                                    canvasRef.current?.handleDelete();
+                                }}
+                                title="Delete selected element (Delete/Backspace)"
+                                className="w-10 h-10 flex items-center justify-center text-orange-500 hover:text-orange-600 hover:scale-105 transition-all rounded-lg hover:bg-orange-100"
+                            >
+                                <Minus size={20} />
+                            </button>
+                        )}
+
+                        {/* Divider */}
+                        <div className="w-8 h-px bg-[#E2E9EC] my-1" />
+
                         {/* Clear Board */}
                         {role !== "VIEWER" && (
                             <button
-                                onClick={clearBoard}
-                                title="Clear Board"
-                                className="w-10 h-10 flex items-center justify-center text-red-500 hover:text-red-600 hover:scale-105 transition-all rounded-lg"
+                                onClick={() => {
+                                    canvasRef.current?.handleClearBoard();
+                                }}
+                                title="Clear entire board"
+                                className="w-10 h-10 flex items-center justify-center text-red-600 hover:text-red-700 hover:scale-105 transition-all rounded-lg hover:bg-red-100"
                             >
                                 <Trash2 size={20} />
                             </button>

@@ -47,6 +47,9 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 
+
+
+
 // get all the shapes
 router.get("/:boardId/elements", authMiddleware, async (req, res) => {
 
@@ -216,6 +219,47 @@ router.post("/:boardId/elements", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error creating element", error);
     res.status(500).json({ error: "Failed to create element" });
+  }
+});
+
+
+/**
+ * 🔹 Delete Element from Board (protected)
+ */
+router.delete("/:boardId/elements/:elementId", authMiddleware, async (req, res) => {
+  const boardId = req.params.boardId as string;
+  const elementId = req.params.elementId as string;
+  const userId = req.userId!;
+
+  try {
+    // 🚫 Ensure user has access to the board
+    const permission = await prisma.permission.findFirst({
+      where: { userId, boardId }
+    });
+
+    if (!permission) return res.status(403).json({ error: "No access to this board" });
+
+    // Find and delete the element
+    const element = await prisma.element.findUnique({
+      where: { id: elementId }
+    });
+
+    if (!element) {
+      return res.status(404).json({ error: "Element not found" });
+    }
+
+    if (element.boardId !== boardId) {
+      return res.status(403).json({ error: "Element does not belong to this board" });
+    }
+
+    await prisma.element.delete({
+      where: { id: elementId }
+    });
+
+    res.json({ message: "Element deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting element", error);
+    res.status(500).json({ error: "Failed to delete element" });
   }
 });
 
