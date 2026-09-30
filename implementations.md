@@ -697,8 +697,92 @@ User Input (Ctrl+Z / Redo Button)
    └─ Direct apply (no history)
 ```
 
----
+## 21. Bug Fix: Undo/Redo Buttons Unclickable
 
-**Implementation Date:** 2026-09-30
-**Status:** Complete and tested
-**Build:** frontend2 (13.65s)
+### Problem
+After initial implementation, undo/redo buttons appeared grayed out and were unresponsive to clicks. The buttons showed the correct disabled/enabled styling but were not functional.
+
+### Root Cause
+**File:** `frontend2/src/features/board/BoardView.tsx` (Line 33)
+
+The issue was in how `canUndo` and `canRedo` were extracted from the store:
+
+```typescript
+// WRONG - extracted as functions
+const { activeTool, setTool, activeColor, setColor, selectedElementId, canUndo, canRedo } = useBoardStore();
+
+// Then called in className:
+className={`... ${canUndo() ? '...' : '...'}`}  // Calling canUndo() during render
+```
+
+**Why This Broke:**
+1. `canUndo` and `canRedo` extracted as function references, not reactive selectors
+2. Calling `canUndo()` during render didn't subscribe to store updates
+3. When `historyIndex` changed in the store, the component didn't re-render
+4. Buttons stayed in initial state (usually disabled/grayed out)
+5. Even when they appeared enabled, they weren't responding to clicks
+
+### Solution Implemented
+**File:** `frontend2/src/features/board/BoardView.tsx` (Lines 33-34)
+
+Changed to use Zustand selectors:
+
+```typescript
+// CORRECT - use selectors
+const canUndo = useBoardStore(state => state.canUndo());
+const canRedo = useBoardStore(state => state.canRedo());
+
+// Then use as boolean values:
+className={`... ${canUndo ? '...' : '...'}`}  // No function call
+```
+
+**Why This Works:**
+1. Zustand selectors automatically subscribe to store state changes
+2. When `historyIndex` or `history` changes, selectors re-evaluate
+3. Component re-renders with updated boolean values
+4. Button className updates immediately
+5. onClick handlers receive current state values
+
+### Button Implementation
+**File:** `frontend2/src/features/board/BoardView.tsx` (Lines 314-329)
+
+```typescript
+<button
+    onClick={() => {
+        console.log('Undo clicked, canUndo:', canUndo);
+        if (canUndo) {
+            canvasRef.current?.handleUndo();
+        }
+    }}
+    className={`flex flex-col items-center hover:scale-110 transition-transform ${
+        canUndo
+            ? 'text-[#5B5F62] hover:text-[#4352A5] cursor-pointer'
+            : 'text-[#D0D5D7] cursor-not-allowed opacity-50'
+    }`}
+    title="Undo (Ctrl+Z)"
+>
+```
+
+### Key Changes:
+1. **State Selectors**: Use `useBoardStore(state => state.canUndo())` instead of destructuring
+2. **Boolean Values**: `canUndo` is now a boolean, not a function
+3. **Guard Clause**: Check `if (canUndo)` before calling handler
+4. **Console Logging**: Added debug logs to trace button clicks
+5. **No Disabled Attribute**: Removed HTML `disabled` attribute that was blocking interaction
+
+### Testing
+✅ Create shape → canUndo becomes true
+✅ Undo button turns blue/active → clickable
+✅ Click Undo → shape disappears
+✅ Redo button turns blue/active → clickable  
+✅ Click Redo → shape reappears
+✅ Console logs show "Undo clicked, canUndo: true"
+
+### Files Modified
+- `frontend2/src/features/board/BoardView.tsx` - Lines 33-34 (selectors), Lines 314-329 (button implementation)
+
+### Build Status
+✅ TypeScript: No errors
+✅ Build: Success (22.20s)
+
+---
