@@ -45,7 +45,7 @@ jobs:
             sudo sync && sudo sysctl -w vm.drop_caches=3
 
             echo "Install dependencies (production only, with fallback)"
-            npm install --legacy-peer-deps --no-save --omit=dev || npm ci --omit=dev
+            npm install --legacy-peer-deps --omit=dev || npm ci --omit=dev
 
             echo "Node and npm versions:"
             node -v
