@@ -35,6 +35,12 @@ jobs:
             echo "Go to backend"
             cd backend
 
+            echo "Set environment variables"
+            cat > .env << 'ENVEOF'
+DATABASE_URL=${{ secrets.DATABASE_URL }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+ENVEOF
+
             echo "Free up memory"
             sudo sync && sudo sysctl -w vm.drop_caches=3
 
