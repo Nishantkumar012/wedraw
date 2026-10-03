@@ -35,21 +35,21 @@ jobs:
             echo "Go to backend"
             cd backend
 
+            echo "Free up memory"
+            sudo sync && sudo sysctl -w vm.drop_caches=3
+
             echo "Install dependencies (production only)"
-            NODE_OPTIONS="--max-old-space-size=256" npm ci --only=production
+            NODE_OPTIONS="--max-old-space-size=512" npm ci --omit=dev
 
             echo "Node and npm versions:"
             node -v
             npm -v
 
-            echo "Generate Prisma Client"
-            npx prisma generate
+            echo "Build TypeScript (includes Prisma generate)"
+            NODE_OPTIONS="--max-old-space-size=512" npm run build
 
             echo "Run database migrations"
             npx prisma migrate deploy
-
-            echo "Build TypeScript"
-            npm run build
 
             echo "Stopping old backend process"
             pm2 delete backend || true
