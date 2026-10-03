@@ -35,11 +35,8 @@ jobs:
             echo "Go to backend"
             cd backend
 
-            echo "Cleaning old node_modules"
-            rm -rf node_modules package-lock.json
-
-            echo "Install dependencies"
-            npm install --prefer-offline --no-audit
+            echo "Install dependencies (production only)"
+            NODE_OPTIONS="--max-old-space-size=256" npm ci --only=production
 
             echo "Node and npm versions:"
             node -v
