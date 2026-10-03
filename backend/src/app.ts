@@ -23,6 +23,7 @@ app.use(cors({
   origin: "*"
 }));
 
+
 app.use(express.json());
 // this uis app.t s
 
