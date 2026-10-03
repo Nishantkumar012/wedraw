@@ -19,34 +19,47 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
+
             if [ -d "$HOME/wedraw/.git" ]; then
               echo "Repository already exists"
-              cd ~/wedraw
+              cd $HOME/wedraw
               git pull origin main
             else
               echo "First deployment: cloning repository"
-              cd ~
+              cd $HOME
               git clone https://github.com/Nishantkumar012/wedraw.git
-              cd ~/wedraw
+              cd $HOME/wedraw
             fi
 
             echo "Go to backend"
             cd backend
 
+            echo "Cleaning old node_modules"
+            rm -rf node_modules package-lock.json
+
             echo "Install dependencies"
-            npm ci
-            
+            npm install --prefer-offline --no-audit
+
+            echo "Node and npm versions:"
             node -v
-            npm ls prisma @prisma/client
-            
+            npm -v
+
             echo "Generate Prisma Client"
             npx prisma generate
+
+            echo "Run database migrations"
+            npx prisma migrate deploy
 
             echo "Build TypeScript"
             npm run build
 
-            echo "Restart backend"
-            pm2 restart backend --update-env || pm2 start dist/index.js --name backend
+            echo "Stopping old backend process"
+            pm2 delete backend || true
+
+            echo "Starting backend with PM2"
+            pm2 start dist/index.js --name backend --node-args="--max-old-space-size=512"
 
             echo "Save PM2 process"
             pm2 save
+            pm2 startup
