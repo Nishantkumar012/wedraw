@@ -29,7 +29,10 @@ jobs:
 
             echo "Install dependencies"
             npm ci
-
+            
+            node -v
+            npm ls prisma @prisma/client
+            
             echo "Generate Prisma Client"
             npx prisma generate
 
