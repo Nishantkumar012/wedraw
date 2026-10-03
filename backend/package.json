@@ -7,7 +7,7 @@
     "dev": "nodemon --watch src --exec tsx src/index.ts",
     "start": "npm run build && node dist/index.js",
     
-  "build": "prisma generate && tsc "
+  "build": " tsc "
 
   },
   "keywords": [],
