@@ -382,6 +382,7 @@ router.post("/:boardId/invite", authMiddleware, async (req, res) => {
 
     // -------------------------
     // 7️⃣ Create permission
+    
     // -------------------------
     const permission = await prisma.permission.create({
       data: {
