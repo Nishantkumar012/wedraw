@@ -1,6 +1,7 @@
 import { Play, Settings, History, ZoomIn, Layers, MessageCircle, MousePointer2, Edit3, Square, Users, Sparkles, Database } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { handleGuestLogin } from './features/auth/Login';
 
 function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -125,8 +126,10 @@ function Home() {
             Experience a soft, tactile canvas for your team's brightest thoughts. Simple, collaborative whiteboarding that feels like a physical workspace.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-[#4352A5] text-white font-semibold text-base px-8 py-4 rounded-full raised-neumorphic-pill transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#4352A5]/20">
-              Try for free
+            <button className="bg-[#4352A5] text-white font-semibold text-base px-8 py-4 rounded-full raised-neumorphic-pill transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#4352A5]/20"
+               onClick={() => handleGuestLogin(navigate)}
+             >
+              Be a Guest
             </button>
             <button className="bg-[#F4FAFD] text-[#4352A5] font-semibold text-base px-8 py-4 rounded-full raised-neumorphic-pill transition-all hover:scale-105 active:shadow-[inset_4px_4px_10px_rgba(163,177,198,0.3),inset_-4px_-4px_10px_rgba(255,255,255,0.7)] flex items-center justify-center gap-2">
               <Play className="w-5 h-5 fill-current" />

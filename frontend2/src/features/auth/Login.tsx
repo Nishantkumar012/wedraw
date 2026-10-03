@@ -4,6 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 import { useAuthStore } from "../../store/useAuthStore";
 
+export const handleGuestLogin = (navigate: ReturnType<typeof useNavigate>) => {
+  const guestToken = import.meta.env.VITE_GUEST_TOKEN;
+  if (guestToken) {
+    useAuthStore.getState().setGuestToken(guestToken);
+    navigate("/dashboard");
+  }
+};
+
 function Login() {
   const navigate = useNavigate();
 
@@ -33,14 +41,6 @@ function Login() {
       }
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
-    }
-  };
-
-  const handleGuestLogin = () => {
-    const guestToken = import.meta.env.VITE_GUEST_TOKEN;
-    if (guestToken) {
-      useAuthStore.getState().setGuestToken(guestToken);
-      navigate("/dashboard");
     }
   };
 
@@ -126,7 +126,7 @@ function Login() {
         <div className="mt-4">
           <button
             type="button"
-            onClick={handleGuestLogin}
+            onClick={() => handleGuestLogin(navigate)}
             className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold
             raised-neumorphic hover:bg-gray-200 active:pressed-neumorphic transition-all"
           >
