@@ -27,6 +27,8 @@ type WS = WebSocket & {
   boardId?: string;
 };
 
+
+
 const PORT = 3000;
 
 // boardId → connected sockets
