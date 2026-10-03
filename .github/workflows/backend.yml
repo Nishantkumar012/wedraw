@@ -19,10 +19,16 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/wedraw
-
-            echo "Pull latest code"
-            git pull origin main
+            if [ -d "$HOME/wedraw/.git" ]; then
+              echo "Repository already exists"
+              cd ~/wedraw
+              git pull origin main
+            else
+              echo "First deployment: cloning repository"
+              cd ~
+              git clone https://github.com/Nishantkumar012/wedraw.git
+              cd ~/wedraw
+            fi
 
             echo "Go to backend"
             cd backend
