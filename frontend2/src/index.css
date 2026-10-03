@@ -49,3 +49,27 @@
   animation: cursor-move 8s ease-in-out infinite;
 }
 
+/* Opacity utilities for decorative elements */
+.opacity-8 {
+  opacity: 0.08;
+}
+
+.opacity-6 {
+  opacity: 0.06;
+}
+
+.opacity-10 {
+  opacity: 0.10;
+}
+
+.opacity-12 {
+  opacity: 0.12;
+}
+
+.opacity-25 {
+  opacity: 0.25;
+}
+
+.opacity-30 {
+  opacity: 0.30;
+}

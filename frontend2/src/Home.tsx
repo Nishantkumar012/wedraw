@@ -114,17 +114,48 @@ function Home() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 md:px-8 min-h-[716px] flex flex-col items-center justify-center overflow-hidden">
         {/* Background Animation Canvas */}
-        <div className="absolute inset-0 w-full h-full -z-10 opacity-30">
+        <div className="absolute inset-0 w-full h-full -z-10 opacity-40">
           <canvas ref={canvasRef} className="block w-full h-full" />
         </div>
 
+        {/* Decorative Background Elements - Enhanced */}
+        {/* Top-right glow circle - more prominent */}
+        <div className="absolute top-12 right-16 w-96 h-96 bg-[#4352A5] rounded-full opacity-12 blur-3xl pointer-events-none" />
+        {/* Bottom-left glow circle - more prominent */}
+        <div className="absolute bottom-24 left-0 w-72 h-72 bg-[#4352A5] rounded-full opacity-10 blur-3xl pointer-events-none" />
+        {/* Center subtle gradient orb */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-80 h-80 bg-gradient-to-br from-[#4352A5] to-transparent rounded-full opacity-8 blur-3xl pointer-events-none" />
+
+        {/* Floating decorative shapes */}
+        <div className="absolute top-32 left-1/4 w-24 h-24 bg-[#F4FAFD] rounded-2xl raised-neumorphic opacity-30 pointer-events-none transform -rotate-12" />
+        <div className="absolute bottom-40 right-1/4 w-20 h-20 bg-[#F4FAFD] rounded-xl raised-neumorphic opacity-25 pointer-events-none transform rotate-45" />
+
         <div className="relative z-10 max-w-3xl text-center flex flex-col items-center">
-          <h1 className="text-[32px] md:text-[32px] leading-[1.2] tracking-[-0.02em] font-bold text-[#161D1F] mb-6">
+          <div className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-[#4352A5]/5 rounded-full border border-[#4352A5]/10">
+            <span className="w-2 h-2 rounded-full bg-[#4352A5] animate-pulse" />
+            <span className="text-sm font-medium text-[#4352A5]">Collaborative whiteboarding</span>
+          </div>
+
+          <h1 className="text-[36px] md:text-[56px] leading-[1.15] tracking-[-0.02em] font-bold text-[#161D1F] mb-6">
             Ideas are better together.
           </h1>
-          <p className="text-base leading-[1.6] text-[#5B5F62] max-w-xl mx-auto mb-10">
+          <p className="text-base md:text-lg leading-[1.7] text-[#5B5F62] max-w-2xl mx-auto mb-4">
             Experience a soft, tactile canvas for your team's brightest thoughts. Simple, collaborative whiteboarding that feels like a physical workspace.
           </p>
+
+          {/* Trust indicator / Social proof placeholder */}
+          <div className="mb-12 flex items-center gap-6 text-sm text-[#5B5F62]">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-[#161D1F]">10K+</span>
+              <span>Creators using WeDraw</span>
+            </div>
+            <div className="w-px h-4 bg-[#E2E9EC]" />
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-[#161D1F]">4.9★</span>
+              <span>Highly rated</span>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4">
             <button className="bg-[#4352A5] text-white font-semibold text-base px-8 py-4 rounded-full raised-neumorphic-pill transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#4352A5]/20"
                onClick={() => handleGuestLogin(navigate)}
@@ -135,6 +166,14 @@ function Home() {
               <Play className="w-5 h-5 fill-current" />
               See how it works
             </button>
+          </div>
+
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 animate-bounce">
+            <span className="text-xs font-semibold text-[#5B5F62] opacity-60">Scroll to explore</span>
+            <svg className="w-6 h-6 text-[#5B5F62] opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
           </div>
         </div>
       </section>
