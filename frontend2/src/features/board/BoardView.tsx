@@ -262,7 +262,15 @@ export const BoardView = () => {
                             {["#000000", "#FF0000", "#00AA00", "#0000FF", "#FFAA00", "#FF00FF", "#00AAAA"].map((color) => (
                                 <button
                                     key={color}
-                                    onClick={() => setColor(color)}
+                                    onClick={() => {
+                                        // If a shape is selected, change its color
+                                        if (selectedElementId && activeTool === 'select') {
+                                            canvasRef.current?.handleColourChange(color);
+                                        } else {
+                                            // Otherwise, set the color for the next shape to be created
+                                            setColor(color);
+                                        }
+                                    }}
                                     className={`
                                         w-7 h-7 rounded transition-all
                                         ${activeColor === color
@@ -275,9 +283,6 @@ export const BoardView = () => {
                                 />
                             ))}
                         </div>
-
-                        {/* Divider */}
-                        <div className="w-8 h-px bg-[#E2E9EC] my-1" />
 
                         {/* Delete Button - Only show when element is selected in select mode */}
                         {role !== "VIEWER" && activeTool === 'select' && selectedElementId && (

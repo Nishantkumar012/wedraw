@@ -266,6 +266,58 @@ router.delete("/:boardId/elements/:elementId", authMiddleware, async (req, res) 
 
 
 /**
+ * 🔹 Update Element Color
+ */
+router.patch("/:boardId/elements/:elementId", authMiddleware, async (req, res) => {
+  const boardId = req.params.boardId as string;
+  const elementId = req.params.elementId as string;
+  const { color } = req.body;
+  const userId = req.userId!;
+
+  try {
+    // Check user has access to board
+    const permission = await prisma.permission.findFirst({
+      where: { userId, boardId }
+    });
+
+    if (!permission) {
+      return res.status(403).json({ error: "No access to this board" });
+    }
+
+    // Find element
+    const element = await prisma.element.findUnique({
+      where: { id: elementId }
+    });
+
+    if (!element) {
+      return res.status(404).json({ error: "Element not found" });
+    }
+
+    if (element.boardId !== boardId) {
+      return res.status(403).json({ error: "Element does not belong to this board" });
+    }
+
+    // Update with new color
+    const updated = await prisma.element.update({
+      where: { id: elementId },
+      data: {
+        data: {
+          ...(typeof element.data === 'object' ? element.data : {}),
+          color
+        }
+      }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Error updating element color", error);
+    res.status(500).json({ error: "Failed to update element color" });
+  }
+});
+
+
+
+/**
  * 🔹 Invite user to board (OWNER only)
  */
 
