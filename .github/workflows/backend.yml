@@ -44,8 +44,8 @@ jobs:
             echo "Free up memory"
             sudo sync && sudo sysctl -w vm.drop_caches=3
 
-            echo "Install dependencies (production only, with fallback)"
-            npm install --legacy-peer-deps --omit=dev || npm ci --omit=dev
+            echo "Install dependencies (including devDependencies for build)"
+            npm install --legacy-peer-deps || npm ci
 
             echo "Node and npm versions:"
             node -v
