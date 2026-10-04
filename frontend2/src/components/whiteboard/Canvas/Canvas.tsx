@@ -11,6 +11,7 @@ export interface CanvasRef {
     handleClearBoard: () => void;
     handleUndo: () => void;
     handleRedo: () => void;
+    handleColourChange: (color:string) => void;
 }
 
 export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
@@ -41,6 +42,8 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
     const canRedo = useBoardStore(state => state.canRedo);
 
     const { userToken, guestToken } = useAuthStore();
+
+    const colorUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Resize canvas
     useEffect(() => {
@@ -148,12 +151,47 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
         }
     };
 
+    const handleColourChange = (color: string) => {
+        if (!selectedElementId) return;
+
+        const element = elements.find(el => el.id === selectedElementId);
+        if (!element) return;
+
+        // 1. Local update: immediate
+        useBoardStore.getState().updateElement(selectedElementId, {
+            data: { ...element.data, color }
+        });
+        pushHistory('element_updated');
+
+        // 2. WebSocket broadcast: immediate (dusre users ko real-time)
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({
+                action: "element_color_changed",
+                boardId: element.boardId,
+                elementId: element.id,
+                color
+            }));
+        }
+
+        // 3. Debounced API call: 300ms (DB save)
+        if (colorUpdateTimerRef.current) {
+            clearTimeout(colorUpdateTimerRef.current);
+        }
+
+        colorUpdateTimerRef.current = setTimeout(() => {
+            api.patch(`/boards/${element.boardId}/elements/${element.id}`, {
+                color
+            }).catch(err => console.error('Failed to update color', err));
+        }, 300);
+    };
+
     // Expose handlers to parent via ref
     useImperativeHandle(ref, () => ({
         handleDelete,
         handleClearBoard,
         handleUndo,
-        handleRedo
+        handleRedo,
+        handleColourChange
     }));
 
     // Keyboard listener for Delete/Backspace and Undo/Redo
@@ -182,6 +220,15 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [activeTool, selectedElementId, elements, deleteElement, handleDelete, handleUndo, handleRedo]);
 
+    // Cleanup effect for color update timer
+    useEffect(() => {
+        return () => {
+            if (colorUpdateTimerRef.current) {
+                clearTimeout(colorUpdateTimerRef.current);
+            }
+        };
+    }, []);
+
     useEffect(() => {
         const token = userToken || guestToken;
         if (!token || !boardId) return;
@@ -192,12 +239,13 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
                     id: el.id,
                     type: el.type.toLowerCase(),
                     boardId: el.boardId,
-                    color: el.data.color || '#000',
-                    data: el.data
+                    color: el.data.color || '#000000',
+                    data: {
+                        ...el.data,
+                        color: el.data.color || '#000000'
+                    }
                 }));
                 setElements(loadedElements);
-                console.log("for testing on s3 in canvas",res)
-                console.log(api+`/boards/${boardId}/elements`)
             })
             .catch(err => console.error('Failed to fetch elements', err));
 
@@ -216,12 +264,15 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
             const msg = JSON.parse(event.data);
             if (msg.action === "element_added") {
                 const el = msg.element;
-                const newShape = {
+                const newShape: ShapeData = {
                     id: el.id,
                     type: el.type.toLowerCase(),
                     boardId: el.boardId,
-                    color: el.data.color || '#000',
-                    data: el.data
+                    color: el.data.color || '#000000',
+                    data: {
+                        ...el.data,
+                        color: el.data.color || '#000000'
+                    }
                 };
 
                 const currentElements = useBoardStore.getState().elements;
@@ -238,6 +289,14 @@ export const Canvas = forwardRef<CanvasRef>((_props, ref) => {
                 useBoardStore.getState().updateElement(msg.elementId, { data: msg.data });
             } else if (msg.action === "element_deleted") {
                 useBoardStore.getState().deleteElement(msg.elementId);
+            } else if (msg.action === "element_color_changed") {
+                const element = useBoardStore.getState().elements.find(el => el.id === msg.elementId);
+                if (element) {
+                    useBoardStore.getState().updateElement(msg.elementId, {
+                        data: { ...element.data, color: msg.color },
+                        color: msg.color
+                    });
+                }
             }
         };
 

@@ -228,10 +228,10 @@ console.log("BOARD:", boardId);
           // _____________________________________
 
               if(msg.action === "element_dragging"){
-                   
+
                     const  { boardId , elementId, data } = msg;
 
-                    
+
 
                     if(!boardId || !elementId || !data) return;
 
@@ -257,6 +257,49 @@ console.log("BOARD:", boardId);
                       }
 
               }
+
+          // ─────────────────────────────────────
+          // 🎨 ELEMENT COLOR CHANGED
+          // ─────────────────────────────────────
+          if (msg.action === "element_color_changed") {
+            const { boardId, elementId, color } = msg;
+            if (!boardId || !elementId || !color) return;
+
+            if (ws.boardId !== boardId) return;
+
+            // Get current element
+            const element = await prisma.element.findUnique({
+              where: { id: elementId }
+            });
+
+            if (!element) return;
+
+            // Update with new color
+            const updated = await prisma.element.update({
+              where: { id: elementId },
+              data: {
+                data: {
+                  ...(typeof element.data === 'object' ? element.data : {}),
+                  color
+                }
+              }
+            });
+
+            const room = rooms.get(boardId);
+            if (!room) return;
+
+            for (const client of room) {
+              if (client.readyState === WebSocket.OPEN) {
+                client.send(
+                  JSON.stringify({
+                    action: "element_color_changed",
+                    elementId: updated.id,
+                    color
+                  })
+                );
+              }
+            }
+          }
 
           // _____________________________________
           
