@@ -190,19 +190,39 @@ export const BoardView = () => {
 
                     {/* Center Menu */}
                     <div className="hidden md:flex items-center gap-4">
-                        <button className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg">
-                            File
-                        </button>
-                        <button className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg">
-                            Edit
-                        </button>
-                        <button className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg">
-                            View
-                        </button>
-                        <button className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg flex items-center gap-2">
-                            <Share2 size={16} />
-                            Share
-                        </button>
+                        <div className="relative group">
+                            <button disabled className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg cursor-not-allowed opacity-60">
+                                File
+                            </button>
+                            <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
+                        <div className="relative group">
+                            <button disabled className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg cursor-not-allowed opacity-60">
+                                Edit
+                            </button>
+                            <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
+                        <div className="relative group">
+                            <button disabled className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg cursor-not-allowed opacity-60">
+                                View
+                            </button>
+                            <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
+                        <div className="relative group">
+                            <button disabled className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg cursor-not-allowed opacity-60 flex items-center gap-2">
+                                <Share2 size={16} />
+                                Share
+                            </button>
+                            <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right Actions */}
@@ -216,15 +236,30 @@ export const BoardView = () => {
                                 <UserPlus size={20} />
                             </button>
                         )}
-                        <button className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full">
-                            <Download size={20} />
-                        </button>
-                        <button className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full">
-                            <Users size={20} />
-                        </button>
-                        <button className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full">
-                            <Settings size={20} />
-                        </button>
+                        <div className="relative group">
+                            <button disabled className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full cursor-not-allowed opacity-60">
+                                <Download size={20} />
+                            </button>
+                            <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
+                        <div className="relative group">
+                            <button disabled className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full cursor-not-allowed opacity-60">
+                                <Users size={20} />
+                            </button>
+                            <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
+                        <div className="relative group">
+                            <button disabled className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full cursor-not-allowed opacity-60">
+                                <Settings size={20} />
+                            </button>
+                            <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
                         <button className="bg-[#4352A5] text-white font-semibold text-sm px-5 py-2 rounded-full raised-neumorphic-pill transition-all hover:scale-105">
                             Share
                         </button>
@@ -351,14 +386,24 @@ export const BoardView = () => {
                             <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Redo</span>
                         </button>
                         <div className="w-px h-8 bg-[#E2E9EC]" />
-                        <button className="flex flex-col items-center text-[#4352A5] font-bold cursor-pointer hover:scale-110 transition-transform">
-                            <ZoomIn className="w-5 h-5" strokeWidth={2.5} />
-                            <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Zoom</span>
-                        </button>
-                        <button className="flex flex-col items-center text-[#5B5F62] hover:text-[#4352A5] cursor-pointer hover:scale-110 transition-transform">
-                            <ZoomOut className="w-5 h-5" strokeWidth={2.5} />
-                            <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Reset</span>
-                        </button>
+                        <div className="relative group">
+                            <button disabled className="flex flex-col items-center text-[#4352A5] font-bold cursor-not-allowed opacity-60 hover:scale-110 transition-transform">
+                                <ZoomIn className="w-5 h-5" strokeWidth={2.5} />
+                                <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Zoom</span>
+                            </button>
+                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
+                        <div className="relative group">
+                            <button disabled className="flex flex-col items-center text-[#5B5F62] hover:text-[#4352A5] cursor-not-allowed opacity-60 hover:scale-110 transition-transform">
+                                <ZoomOut className="w-5 h-5" strokeWidth={2.5} />
+                                <span className="text-[11px] leading-none tracking-[0.05em] font-semibold mt-1">Reset</span>
+                            </button>
+                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                                Coming soon
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>

@@ -75,23 +75,43 @@ function Home() {
 
         {/* Center Navigation (Desktop) */}
         <div className="hidden md:flex items-center gap-6">
-          <a href="#" className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg">
-            Features
-          </a>
-          <a href="#" className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg">
-            Pricing
-          </a>
+          <div className="relative group">
+            <button disabled className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg cursor-not-allowed opacity-60">
+              Features
+            </button>
+            <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+              Coming soon
+            </div>
+          </div>
+          <div className="relative group">
+            <button disabled className="text-[#5B5F62] font-medium text-sm hover:bg-[#E2E9EC] transition-all px-4 py-2 rounded-lg cursor-not-allowed opacity-60">
+              Pricing
+            </button>
+            <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+              Coming soon
+            </div>
+          </div>
         </div>
 
         {/* CTA & Trailing Icons */}
         <div className="flex items-center gap-4">
           <div className="hidden md:flex gap-2">
-            <button className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full cursor-pointer">
-              <Settings className="w-5 h-5" />
-            </button>
-            <button className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full cursor-pointer">
-              <History className="w-5 h-5" />
-            </button>
+            <div className="relative group">
+              <button disabled className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full cursor-not-allowed opacity-60">
+                <Settings className="w-5 h-5" />
+              </button>
+              <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                Coming soon
+              </div>
+            </div>
+            <div className="relative group">
+              <button disabled className="text-[#5B5F62] hover:bg-[#E2E9EC] transition-all p-2 rounded-full cursor-not-allowed opacity-60">
+                <History className="w-5 h-5" />
+              </button>
+              <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                Coming soon
+              </div>
+            </div>
           </div>
           <button
             onClick={() => navigate('/login')}
@@ -105,8 +125,11 @@ function Home() {
           >
             Sign Up
           </button>
-          <button className="bg-[#F4FAFD] text-[#4352A5] font-semibold text-base px-6 py-2 rounded-full raised-neumorphic-pill active:shadow-[inset_4px_4px_10px_rgba(163,177,198,0.3),inset_-4px_-4px_10px_rgba(255,255,255,0.7)] transition-all hover:scale-105">
+          <button disabled className="bg-[#F4FAFD] text-[#4352A5] font-semibold text-base px-6 py-2 rounded-full raised-neumorphic-pill active:shadow-[inset_4px_4px_10px_rgba(163,177,198,0.3),inset_-4px_-4px_10px_rgba(255,255,255,0.7)] transition-all hover:scale-105 cursor-not-allowed opacity-60 relative group" title="Coming soon">
             Start drawing
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+              Coming soon
+            </div>
           </button>
         </div>
       </nav>
@@ -139,22 +162,9 @@ function Home() {
           <h1 className="text-[36px] md:text-[56px] leading-[1.15] tracking-[-0.02em] font-bold text-[#161D1F] mb-6">
             Ideas are better together.
           </h1>
-          <p className="text-base md:text-lg leading-[1.7] text-[#5B5F62] max-w-2xl mx-auto mb-4">
+          <p className="text-base md:text-lg leading-[1.7] text-[#5B5F62] max-w-2xl mx-auto mb-12">
             Experience a soft, tactile canvas for your team's brightest thoughts. Simple, collaborative whiteboarding that feels like a physical workspace.
           </p>
-
-          {/* Trust indicator / Social proof placeholder */}
-          <div className="mb-12 flex items-center gap-6 text-sm text-[#5B5F62]">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-[#161D1F]">10K+</span>
-              <span>Creators using WeDraw</span>
-            </div>
-            <div className="w-px h-4 bg-[#E2E9EC]" />
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-[#161D1F]">4.9★</span>
-              <span>Highly rated</span>
-            </div>
-          </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
             <button className="bg-[#4352A5] text-white font-semibold text-base px-8 py-4 rounded-full raised-neumorphic-pill transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#4352A5]/20"
@@ -162,9 +172,12 @@ function Home() {
              >
               Be a Guest
             </button>
-            <button className="bg-[#F4FAFD] text-[#4352A5] font-semibold text-base px-8 py-4 rounded-full raised-neumorphic-pill transition-all hover:scale-105 active:shadow-[inset_4px_4px_10px_rgba(163,177,198,0.3),inset_-4px_-4px_10px_rgba(255,255,255,0.7)] flex items-center justify-center gap-2">
+            <button disabled className="bg-[#F4FAFD] text-[#4352A5] font-semibold text-base px-8 py-4 rounded-full raised-neumorphic-pill transition-all hover:scale-105 active:shadow-[inset_4px_4px_10px_rgba(163,177,198,0.3),inset_-4px_-4px_10px_rgba(255,255,255,0.7)] flex items-center justify-center gap-2 cursor-not-allowed opacity-60 relative group" title="Coming soon">
               <Play className="w-5 h-5 fill-current" />
               See how it works
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[#161D1F] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+                Coming soon
+              </div>
             </button>
           </div>
 
