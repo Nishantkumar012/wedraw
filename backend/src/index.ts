@@ -33,6 +33,7 @@ type WS = WebSocket & {
 
 const PORT = 3000;
 
+
 // boardId → connected sockets
 const rooms = new Map<string, Set<WebSocket>>();
 

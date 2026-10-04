@@ -39,6 +39,8 @@ jobs:
             cat > .env << 'ENVEOF'
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PORT=3000
+            NODE_ENV=production
             ENVEOF
 
             echo "Free up memory"
@@ -66,3 +68,6 @@ jobs:
             echo "Save PM2 process"
             pm2 save
             pm2 startup
+
+            echo "Check backend logs"
+            pm2 logs backend --lines 50 --nostream
