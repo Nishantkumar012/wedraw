@@ -59,23 +59,30 @@ export const BoardView = () => {
 
     // Load custom colors from localStorage on mount
     useEffect(() => {
-        const savedColors = localStorage.getItem('customColors');
+        if (!boardId) return;
+        const storageKey = `customColors_${boardId}`;
+        const savedColors = localStorage.getItem(storageKey);
+        console.log('Loading customColors from localStorage with key:', storageKey, 'Value:', savedColors);
         if (savedColors) {
             try {
                 const parsed = JSON.parse(savedColors);
                 if (Array.isArray(parsed)) {
+                    console.log('Parsed custom colors:', parsed);
                     setCustomColors(parsed);
                 }
             } catch (err) {
                 console.error('Failed to parse saved custom colors:', err);
             }
         }
-    }, []);
+    }, [boardId]);
 
     // Save custom colors to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem('customColors', JSON.stringify(customColors));
-    }, [customColors]);
+        if (!boardId) return;
+        const storageKey = `customColors_${boardId}`;
+        console.log('Saving customColors to localStorage with key:', storageKey, 'Value:', customColors);
+        localStorage.setItem(storageKey, JSON.stringify(customColors));
+    }, [customColors, boardId]);
 
     useEffect(() => {
         if (guestTokenParam) {
@@ -404,14 +411,14 @@ export const BoardView = () => {
                     <Canvas ref={canvasRef} />
 
                     {/* Left Floating Toolbar */}
-                    <div className="absolute left-6 top-1/2 -translate-y-1/2 w-16 bg-[#F4FAFD] rounded-xl raised-neumorphic flex flex-col items-center gap-3 py-4 z-40">
+                    <div className="absolute left-6 top-8 bottom-8 w-16 bg-[#F4FAFD] rounded-xl raised-neumorphic flex flex-col items-center gap-3 py-4 z-40 overflow-y-auto scrollbar-hide">
                         {tools.map((tool) => (
                             <button
                                 key={tool.id}
                                 onClick={() => setTool(tool.id)}
                                 title={tool.label}
                                 className={`
-                                    w-10 h-10 flex items-center justify-center rounded-lg transition-all
+                                    w-10 h-10 flex items-center justify-center rounded-lg transition-all flex-shrink-0
                                     ${activeTool === tool.id
                                         ? 'text-[#4352A5] bg-[#DDE4E6] pressed-neumorphic'
                                         : 'text-[#5B5F62] hover:text-[#4352A5] hover:scale-105'
@@ -423,12 +430,12 @@ export const BoardView = () => {
                         ))}
 
                         {/* Divider */}
-                        <div className="w-8 h-px bg-[#E2E9EC] my-1" />
+                        <div className="w-8 h-px bg-[#E2E9EC] my-1 flex-shrink-0" />
 
                         {/* Color Palette Section - Independently Scrollable (Hidden Scrollbar) */}
-                        <div className="flex flex-col items-center max-h-96 overflow-y-auto scrollbar-hide">
+                        <div className="flex flex-col items-center flex-1 overflow-y-auto scrollbar-hide min-h-0">
                             {/* Basic Colors */}
-                            <div className="flex flex-col items-center gap-2 w-full px-2">
+                            <div className="flex flex-col items-center gap-2 w-full px-2 flex-shrink-0">
                                 <div className="text-xs font-medium text-[#5B5F62] mb-1">Basic</div>
                                 {["#000000", "#FF0000", "#00AA00", "#0000FF", "#FFAA00", "#FF00FF", "#00AAAA"].map((color) => (
                                     <button
@@ -444,7 +451,7 @@ export const BoardView = () => {
                                             }
                                         }}
                                         className={`
-                                            w-7 h-7 rounded transition-all
+                                            w-7 h-7 rounded transition-all flex-shrink-0
                                             ${activeColor === color
                                                 ? 'ring-2 ring-offset-2 ring-[#4352A5] scale-110'
                                                 : 'hover:scale-105'
@@ -462,22 +469,23 @@ export const BoardView = () => {
                                     setSelectedCustomColorIdx(null);
                                     setIsColorPickerOpen(true);
                                 }}
-                                className="w-7 h-7 rounded transition-all hover:scale-105 border-2 border-dashed border-[#4352A5] flex items-center justify-center mt-2"
+                                className="w-7 h-7 rounded transition-all hover:scale-105 border-2 border-dashed border-[#4352A5] flex items-center justify-center mt-2 flex-shrink-0"
                                 title="Custom color"
                             >
                                 <Palette size={14} className="text-[#4352A5]" />
                             </button>
 
                             {/* Divider */}
-                            {customColors.length > 0 && <div className="w-6 h-px bg-[#E2E9EC] my-2" />}
+                            {customColors.length > 0 && <div className="w-6 h-px bg-[#E2E9EC] my-2 flex-shrink-0" />}
 
                             {/* Custom Saved Colors */}
                             {customColors.length > 0 && (
                                 <div className="flex flex-col items-center gap-2 w-full px-2">
-                                    <div className="text-xs font-medium text-[#5B5F62]">Custom</div>
+                                    <div className="text-xs font-medium text-[#5B5F62] flex-shrink-0">Custom</div>
                                     {customColors.map((color, idx) => (
-                                        <button
+                                        <div
                                             key={idx}
+                                            className="relative group w-7 h-7"
                                             onClick={() => {
                                                 setSelectedCustomColorIdx(idx);
                                                 // If a shape is selected, change its color
@@ -488,45 +496,55 @@ export const BoardView = () => {
                                                     setColor(color);
                                                 }
                                             }}
-                                            className={`
-                                                w-7 h-7 rounded transition-all group relative
-                                                ${activeColor === color && selectedCustomColorIdx === idx
-                                                    ? 'ring-2 ring-offset-2 ring-[#4352A5] scale-110'
-                                                    : 'hover:scale-105 border-2 border-[#E2E9EC]'
-                                                }
-                                            `}
-                                            style={{ backgroundColor: color }}
-                                            title={color}
-                                        />
+                                        >
+                                            <button
+                                                className={`
+                                                    w-full h-full rounded transition-all
+                                                    ${activeColor === color && selectedCustomColorIdx === idx
+                                                        ? 'ring-2 ring-offset-2 ring-[#4352A5] scale-110'
+                                                        : 'hover:scale-105 border-2 border-[#E2E9EC]'
+                                                    }
+                                                `}
+                                                style={{ backgroundColor: color }}
+                                                title={color}
+                                            />
+                                            {/* Delete button on hover */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const updatedColors = customColors.filter((_, i) => i !== idx);
+                                                    setCustomColors(updatedColors);
+                                                    if (selectedCustomColorIdx === idx) {
+                                                        setSelectedCustomColorIdx(null);
+                                                        setColor("#000000");
+                                                    }
+                                                }}
+                                                className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 leading-none p-0"
+                                                title="Delete custom color"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
                                     ))}
                                 </div>
                             )}
                         </div>
 
-                        {/* Delete Button - Only show when element is selected in select mode OR custom color selected */}
-                        {role !== "VIEWER" && activeTool === 'select' && (selectedElementId || selectedCustomColorIdx !== null) && (
+                        {/* Delete Button - Only show when element is selected in select mode */}
+                        {role !== "VIEWER" && activeTool === 'select' && selectedElementId && (
                             <button
                                 onClick={() => {
-                                    // Delete custom color if one is selected
-                                    if (selectedCustomColorIdx !== null) {
-                                        const updatedColors = customColors.filter((_, i) => i !== selectedCustomColorIdx);
-                                        setCustomColors(updatedColors);
-                                        setSelectedCustomColorIdx(null);
-                                        setColor("#000000"); // Reset to black
-                                        return;
-                                    }
-                                    // Delete canvas element if one is selected
                                     canvasRef.current?.handleDelete();
                                 }}
-                                title={selectedCustomColorIdx !== null ? "Delete custom color" : "Delete selected element (Delete/Backspace)"}
-                                className="w-10 h-10 flex items-center justify-center text-orange-500 hover:text-orange-600 hover:scale-105 transition-all rounded-lg hover:bg-orange-100"
+                                title="Delete selected element (Delete/Backspace)"
+                                className="w-10 h-10 flex items-center justify-center text-orange-500 hover:text-orange-600 hover:scale-105 transition-all rounded-lg hover:bg-orange-100 shrink-0"
                             >
                                 <Minus size={20} />
                             </button>
                         )}
 
                         {/* Divider */}
-                        <div className="w-8 h-px bg-[#E2E9EC] my-1" />
+                        <div className="w-8 h-px bg-[#E2E9EC] my-1 shrink-0" />
 
                         {/* Clear Board */}
                         {role !== "VIEWER" && (
@@ -535,7 +553,7 @@ export const BoardView = () => {
                                     canvasRef.current?.handleClearBoard();
                                 }}
                                 title="Clear entire board"
-                                className="w-10 h-10 flex items-center justify-center text-red-600 hover:text-red-700 hover:scale-105 transition-all rounded-lg hover:bg-red-100"
+                                className="w-10 h-10 flex items-center justify-center text-red-600 hover:text-red-700 hover:scale-105 transition-all rounded-lg hover:bg-red-100 shrink-0"
                             >
                                 <Trash2 size={20} />
                             </button>
@@ -801,6 +819,7 @@ export const BoardView = () => {
                                     onClick={() => {
                                         if (!customColors.includes(customColor) && customColors.length < 8) {
                                             setCustomColors([...customColors, customColor]);
+                                            showToast('Color saved! ✅', 'success');
                                         }
                                     }}
                                     disabled={customColors.includes(customColor) || customColors.length >= 8}
