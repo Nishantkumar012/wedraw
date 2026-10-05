@@ -54,27 +54,27 @@ export const BoardView = () => {
     const [hue, setHue] = useState(0);
     const [saturation, setSaturation] = useState(100);
     const [brightness, setBrightness] = useState(100);
-    const [customColors, setCustomColors] = useState<string[]>([]);
-    const [selectedCustomColorIdx, setSelectedCustomColorIdx] = useState<number | null>(null);
 
-    // Load custom colors from localStorage on mount
-    useEffect(() => {
-        if (!boardId) return;
+    // Initialize customColors from localStorage
+    const [customColors, setCustomColors] = useState<string[]>(() => {
+        if (!boardId) return [];
         const storageKey = `customColors_${boardId}`;
-        const savedColors = localStorage.getItem(storageKey);
-        console.log('Loading customColors from localStorage with key:', storageKey, 'Value:', savedColors);
-        if (savedColors) {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
             try {
-                const parsed = JSON.parse(savedColors);
+                const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed)) {
-                    console.log('Parsed custom colors:', parsed);
-                    setCustomColors(parsed);
+                    console.log('Loaded custom colors from localStorage:', parsed);
+                    return parsed;
                 }
             } catch (err) {
                 console.error('Failed to parse saved custom colors:', err);
             }
         }
-    }, [boardId]);
+        return [];
+    });
+
+    const [selectedCustomColorIdx, setSelectedCustomColorIdx] = useState<number | null>(null);
 
     // Save custom colors to localStorage whenever they change
     useEffect(() => {
@@ -485,19 +485,19 @@ export const BoardView = () => {
                                     {customColors.map((color, idx) => (
                                         <div
                                             key={idx}
-                                            className="relative group w-7 h-7"
-                                            onClick={() => {
-                                                setSelectedCustomColorIdx(idx);
-                                                // If a shape is selected, change its color
-                                                if (selectedElementId && activeTool === 'select') {
-                                                    canvasRef.current?.handleColourChange(color);
-                                                } else {
-                                                    // Otherwise, set the color for the next shape to be created
-                                                    setColor(color);
-                                                }
-                                            }}
+                                            className="relative w-7 h-7 group"
                                         >
                                             <button
+                                                onClick={() => {
+                                                    setSelectedCustomColorIdx(idx);
+                                                    // If a shape is selected, change its color
+                                                    if (selectedElementId && activeTool === 'select') {
+                                                        canvasRef.current?.handleColourChange(color);
+                                                    } else {
+                                                        // Otherwise, set the color for the next shape to be created
+                                                        setColor(color);
+                                                    }
+                                                }}
                                                 className={`
                                                     w-full h-full rounded transition-all
                                                     ${activeColor === color && selectedCustomColorIdx === idx
@@ -508,7 +508,7 @@ export const BoardView = () => {
                                                 style={{ backgroundColor: color }}
                                                 title={color}
                                             />
-                                            {/* Delete button on hover */}
+                                            {/* Delete button on hover - more visible */}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -519,7 +519,7 @@ export const BoardView = () => {
                                                         setColor("#000000");
                                                     }
                                                 }}
-                                                className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 leading-none p-0"
+                                                className="absolute -top-3 -right-3 w-5 h-5 bg-red-500 text-white rounded-full text-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 hover:scale-110 leading-none p-0 font-bold shadow-md"
                                                 title="Delete custom color"
                                             >
                                                 ×
